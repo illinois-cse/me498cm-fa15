@@ -11,25 +11,670 @@
   </head>
   <body>
     <section class="page-header">
-      <h1 class="project-name">ME 498CM · Fall 2015</h1>
-      <h2 class="project-tagline">Tools of Computational Mechanics · Neal Davis, CSE</h2>
-      <!--
-      <a href="https://github.com/uiuc-cse/me498cm-fa15" class="btn">View on GitHub</a>
-      <a href="https://github.com/uiuc-cse/me498cm-fa15/zipball/master" class="btn">Download .zip</a>
-      <a href="https://github.com/uiuc-cse/me498cm-fa15/tarball/master" class="btn">Download .tar.gz</a>
-      -->
+      <table style="width:100%;"><tbody><tr>
+        <td style="width:15%;"><img src="./img/header.png" align="left;" height="80%;"></td>
+        <td style="width:85%;">
+        <h1 class="project-name">ME 498CM · Fall 2015</h1>
+        <h2 class="project-tagline">Tools of Computational Mechanics · Neal Davis, CSE</h2>
+        </td></tr></tbody></table>
     </section>
 
     <section class="main-content">
-      <h3>
-<a id="me-498cm--tools-of-computational-mechanics" class="anchor" href="#me-498cm--tools-of-computational-mechanics" aria-hidden="true"><span class="octicon octicon-link"></span></a>ME 498CM • Tools of Computational Mechanics</h3>
-
 <p>
-This is the home page for ME498CM, a course to teach you the principles of ANSYS Mechanical APDL, ANSYS Fluent CFD, and 3DS Simulia Abaqus FEA.
+ME 498CM is a course designed to teach you the principles of ANSYS Mechanical APDL, ANSYS Fluent CFD, and 3DS Simulia Abaqus FEA.
+</p>
+<p>
+This course will provide an opportunity for students who have been introduced to principles of finite element analysis and computational fluid dynamics (by taking ME 412, ATMS 502, ME 554, etc.) to learn the basic and intermediate functionality of widely used commercial mechanics packages.  Two finite element analysis packages, ANSYS Mechanical APDL and Abaqus FEA, and one computational fluid dynamics package, Fluent CFD, will be covered.
+</p>
+<p>
+The course will be taught Tuesdays and Thursdays in 1h20m applied lecture sections, with other lab hours available for consulting and exercise help.  Applied lectures will introduce modeling methods and software capabilities as well as feature the hands-on demonstration of fundamental principles and techniques.  Students will be expected to follow along and then apply the principles to short exercises and projects for each package.
 </p>
 
+<h3><a href="./docs/syllabus.pdf">Syllabus</a></h3>
+
+<h3>Course Outline &amp; Schedule</h3>
+<p style="margin-bottom: 0.1in; font-weight: normal">The course is
+decomposed into three logical units, one addressing each software
+package exclusively.  (This outline and schedule are subject to
+revision.)</p>
+
+<table width="100%" cellpadding="4" cellspacing="0">
+	<col width="7*">
+	<col width="85*">
+	<col width="94*">
+	<col width="39*">
+	<col width="32*">
+	<tr>
+		<td colspan="5" width="100%" valign="top" style="border: none; padding: 0in">
+			<p style="margin-left: 0.5in; text-indent: -0.5in; font-weight: normal">
+			<i><b>ANSYS Mechanical APDL</b> for 
+			Structural Analysis</i><span style="font-style: normal"> · </span><span style="font-style: normal">TA:  Smruthi
+			Murali</span></p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">1</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Finite element analysis
+			workflow</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Aug 25</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			1</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Fri, Sep 4</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">2</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Meshing, elements, &amp;
+			geometry</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Aug 27</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Homework
+			2</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p>Fri, Sep 11</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">3</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Postprocessing</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Sep 1</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			3</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p>Fri, Sep 18</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">4</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Solution methods</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Sep 3</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			4</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p>Fri, Sep 25</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">5</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Boundary conditions</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Sep 8</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal"><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">6</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Geometry importing</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Sep 10</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">7</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Batch programming &amp; scripting</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Sep 15</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">8</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Thermal coupling</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Sep 17</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">9</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Nonlinear &amp; contact
+			FEA</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Sep 22</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+</table>
+<br/>
+
+</p>
+<table width="100%" cellpadding="4" cellspacing="0">
+	<col width="7*">
+	<col width="85*">
+	<col width="94*">
+	<col width="39*">
+	<col width="32*">
+	<tr>
+		<td colspan="5" width="100%" valign="top" style="border: none; padding: 0in">
+			<p style="margin-left: 0.5in; text-indent: -0.5in; font-weight: normal">
+			<i><b>ANSYS </b><b>Fluent </b><b>CFD</b>
+			for Computational Fluid Dynamics · </i><span style="font-style: normal">TA:  Zhongzhong Zhang</span></p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">1</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Finite volume method
+			workflow</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Sep 24</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			1</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Fri, Oct 9</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">2</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Postprocessing</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Sep 29</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Homework
+			2</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Fri, Oct 16</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">3</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Composite geometry
+			construction</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Oct 1</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			3</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Fri, Oct 23</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">4</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Convective flow</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Oct 6</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			4</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Fri, Oct 30</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">5</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Boundary conditions &amp;
+			UDFs</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Oct 8</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">6</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Transient solution</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Oct 13</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">7</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Compressible
+			flow/Thermal coupling</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Oct 15</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">8</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Turbulent flow</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Oct 20</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">9</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Chemical reactivity</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Oct 22</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">10</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Applications</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Oct 27</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+</table>
+<br/>
+
+</p>
+<table width="100%" cellpadding="4" cellspacing="0">
+	<col width="7*">
+	<col width="85*">
+	<col width="94*">
+	<col width="39*">
+	<col width="32*">
+	<tr>
+		<td colspan="5" width="100%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal"><i><b>3DS
+			</b><b>Abaqus </b><b>FEA</b> for Structural
+			Analysis · </i><span style="font-style: normal">Assistant:  <a href="http://autonomic.beckman.illinois.edu/people.html">Masoud
+			Safdari</a></span></p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">1</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Finite element analysis
+			workflow</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Thu, Oct 29</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			1</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Fri, Nov 13</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">2</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Loading &amp; analysis</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Tue, Nov 3</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Homework
+			2</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p>Fri, Nov 20</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">3</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Thermal coupling</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Thu, Nov 5</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			3</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p>Fri, Dec 4</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">4</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Meshing</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Tue, Nov 10</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p>Homework
+			4</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p>Wed, Dec 9</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">5</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Transient solution</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Thu, Nov 12</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">6</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Material &amp; yield
+			models</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p style="font-weight: normal">Tue, Nov 17</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">7</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Dynamic &amp; contact
+			FEA</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Thu, Nov 19</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">8</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Batch programming &amp;
+			scripting</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Tue, Dec 1</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">9</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Applications</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Thu, Dec 3</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<td width="3%" style="border: none; padding: 0in">
+			<p align="center"><font size="1" style="font-size: 8pt">10</font></p>
+		</td>
+		<td width="33%" valign="top" style="border: none; padding: 0in">
+			<p>Applications</p>
+		</td>
+		<td width="37%" valign="top" style="border: none; padding: 0in">
+			<p>Tue, Dec 8</p>
+		</td>
+		<td width="15%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+		<td width="12%" valign="top" style="border: none; padding: 0in">
+			<p><br/>
+
+			</p>
+		</td>
+	</tr>
+</table>
+
       <footer class="site-footer">
-        <span class="site-footer-owner"><a href="https://github.com/uiuc-cse/me498cm-fa15">ME498CM-Fa15</a> is maintained by <a href="https://github.com/uiuc-cse">Neal Davis</a>.</span>
+        <!--<span class="site-footer-owner"><a href="https://github.com/uiuc-cse/me498cm-fa15">ME498CM-Fa15</a> is maintained by <a href="https://github.com/uiuc-cse">Neal Davis</a>.</span>-->
         <a href="http://cse.illinois.edu"><img src="./img/footer.png" width="100%"/></a>
       </footer>
 
@@ -48,4 +693,3 @@ This is the home page for ME498CM, a course to teach you the principles of ANSYS
 
   </body>
 </html>
-
