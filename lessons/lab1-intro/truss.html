@@ -1,0 +1,107 @@
+<h1 id="truss-loading">Truss Loading</h1>
+<div class="figure">
+<img src="./img/truss.png" />
+
+</div>
+<p>A truss is shown in the figure. The cross sectional areas of the links are 3250 mm1. The Young’s modulus is 200 GPa and the Poisson’s ratio is 1.1. The Key points are shown in red and the links are shown in blue. The applied loads are also shown in the figure. The goal is to do Finite Element Analysis of the structure and post process the results.</p>
+<ol style="list-style-type: decimal">
+<li><p>Title: <code>Utility Menu→File→Change Title</code></p></li>
+<li><p>Enter title, Ok and then Utility Menu→Plot→Replot The following keypoints are to be entered next:</p></li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Keypoint</th>
+<th align="left"><span class="math"><em>x</em></span></th>
+<th align="left"><span class="math"><em>y</em></span></th>
+<th align="left"><span class="math"><em>z</em></span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">0</td>
+<td align="left">0</td>
+<td align="left">0</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">1800</td>
+<td align="left">3118</td>
+<td align="left">0</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">3600</td>
+<td align="left">0</td>
+<td align="left">0</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">5400</td>
+<td align="left">3118</td>
+<td align="left">0</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">7200</td>
+<td align="left">0</td>
+<td align="left">0</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">9000</td>
+<td align="left">3118</td>
+<td align="left">0</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">10800</td>
+<td align="left">0</td>
+<td align="left"></td>
+</tr>
+</tbody>
+</table>
+<ol style="list-style-type: decimal">
+<li><p>Keyword selection: <code>Main menu→Preprocessor→Modeling→Create→Keypoints→In Active CS</code></p></li>
+<li><p>Enter the coordinates and press apply until done</p></li>
+<li><p>Drawing lines: <code>Preprocessor→Modeling→Create→Lines→Lines→In Active Coord</code></p></li>
+<li><p>Start picking keypoints and press ok once done.</p></li>
+<li><p>Defining elements: <code>Preprocessor→Element type→Add/Edit/Delete</code></p></li>
+<li><p>Choose <code>Structural mass→Link→3D finit stn 180</code> and then ok</p></li>
+<li><p>Real constants: <code>Preprocessor→Real Constants→Add/Edit/Delete</code> and then click Add</p>
+<ol style="list-style-type: decimal">
+<li>Enter <code>3250</code> as <code>area</code> and press Ok. After that close the real constant box.</li>
+</ol></li>
+<li><p>Material properties: <code>Preprocessor→Material props→Material Models</code></p></li>
+<li><p><code>Structural→Linear→Elastic→Isotropic</code>. Enter <code>200000</code> as <code>Ex</code> and <code>1.3</code> as <code>PRxy</code>. Then select ok and close material model window.</p></li>
+<li><p>Meshing: <code>Preprocessor→Meshing→Size Cntrls→ManualSize→Lines→All Lines</code>. Enter <code>1</code> in the <code>NDIV</code> field and then select ok.</p></li>
+<li><p><code>Preprocessor→Meshing→Mesh→Lines</code></p></li>
+<li><p>Select <code>Pick All</code></p></li>
+<li><p>Keypoint numbering: <code>Utility Menu→PlotCtrls→Numbering</code>. Select as shown in the figure and select ok.</p></li>
+<li><p>Saving: <code>Utility Menu→File→Save as</code>. Enter the file name and select the directory where you would like to save your file and then select ok.</p></li>
+<li><p>Solution type: <code>Main Menu→Solution→Analysis Type→New Analysis</code>. Select as shown and then ok.</p></li>
+<li><p><code>Utility Menu→Plot→Keypoints→Keypoints</code>.</p></li>
+<li>Constraints: <code>Main Menu→Solution→Define Loads→Apply→Structural→Displacement→On Keypoints</code>. Select <code>Keypoint 1</code> and select ok in the selection box.
+<ol style="list-style-type: decimal">
+<li><p>Select <code>All DOF</code>, enter <code>0</code> in <code>VALUE</code> and then select ok.</p></li>
+<li><p>Similarly apply the constraint on the right end by deselecting <code>All DOF</code>, selecting <code>UY</code> and finally entering <code>1</code>.</p></li>
+</ol></li>
+<li><p>Loading: <code>Solution→Define Loads→Apply→Structural→Force/Moment→On Keypoints</code>. Select Keypoint 1 and then select ok.</p>
+<ol style="list-style-type: decimal">
+<li><p>Select <code>FY</code> in <code>Direction of force/mom</code>, <code>Constant value</code> in <code>Apply as</code> and enter <code>-280000</code> in <code>VALUE</code>. Then select ok.</p></li>
+<li><p>Apply the remaining loads similarly. At the end the structure will show the loads.</p></li>
+</ol></li>
+<li><p>Solving: <code>Main Menu→Solution→Solve→Current LS</code>. Then select ok. Once solution is done close the box.</p></li>
+<li><p>Reaction forces: <code>General Postproc→List Results→Reaction Solu</code>. Select <code>All struc forc F</code> and then select ok. The window will give the reaction force results.</p></li>
+<li><p>Deflection : <code>General Postproc→Plot Results→Deformed Shape</code>. Select <code>Def + undef edge</code> and then ok.</p>
+<ol style="list-style-type: decimal">
+<li>The screen should show the deflection plot.</li>
+</ol></li>
+<li><p>Deflection contour: <code>General Postproc→Plot results→Contour Plot→Nodal Solu</code>. Then select as shown in the figure and select ok.</p></li>
+<li><p>The screen should show the displacement contour plot.</p></li>
+<li><p>Listing deflection: <code>General Postproc→List Results→Nodal Solution</code>. Then select DOF solution and Displacement vector sum as before. Then select ok.</p>
+<ol style="list-style-type: decimal">
+<li>The results are shown in terms of nodes. The node and Keypoint numbering may not be the same. The node numbering can be obtained by selecting Plot from the Utility menu.</li>
+</ol></li>
+</ol>

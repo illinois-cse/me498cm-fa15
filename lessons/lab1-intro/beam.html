@@ -1,0 +1,38 @@
+<h1 id="beam-loading">Beam Loading</h1>
+<div class="figure">
+<img src="./img/beam.png" />
+
+</div>
+<p>A cantilever beam is loaded as shown in the figure. The Young’s Modulus is 29e6 psi and the Poisson’s ratio is 0.1. The goal is to do Finite Element Analysis of the problem and post process the results.</p>
+<ol style="list-style-type: decimal">
+<li><p>Title: <code>Utility Menu→File→Change Title</code></p></li>
+<li><p>Enter title, Ok and then <code>Utility Menu→Plot→Replot</code></p></li>
+<li><p>Keypoint selection: <code>Main menu→Preprocessor→Modeling→Create→Keypoints→In Active CS</code></p></li>
+<li><p>Enter the coordinates <span class="math">(0, 0)</span> and <span class="math">(20, 0)</span>. Press apply until done and then press ok.</p></li>
+<li><p>Drawing lines: <code>Preprocessor→Modeling→Create→Lines→Lines→In Active Coord</code>. Pick the two keypoints and then press ok.</p></li>
+<li><p>Defining elements: <code>Preprocessor→Element type→Add/Edit/Delete</code>. Choose Structural mass→Beam→2 node 188 and then ok.</p></li>
+<li><p>Material properties: <code>Preprocessor→Material props→Material Models</code>.</p></li>
+<li><p><code>Structural→Linear→Elastic→Isotropic</code>. Enter <code>29e6</code> as <code>Ex</code> and <code>0.3</code> as <code>PRxy</code>. Then select ok and close material model window.</p></li>
+<li><p>Beam section: <code>Main Menu→Preprocessor→Sections→Beam→Common Sections</code>. Choose the rectangular section and enter 2 for H and 4 for B as the dimensions.</p></li>
+<li><p>Meshing: <code>Preprocessor→Meshing→MeshTool→Size Cntrls→Lines→Set</code>. Select the line and enter 20 in the NDIV field and then select ok.</p></li>
+<li><p><code>Preprocessor→Meshing→MeshTool→Mesh</code>. Select the line and then select ok.</p></li>
+<li><p>Saving: <code>Utility Menu→File→Save as</code>. Enter the file name and select the directory where you would like to save your file and then select ok.</p></li>
+<li><p>Solution type: <code>Main Menu→Solution→Analysis Type→New Analysis</code>; <code>Static</code></p></li>
+<li><p><code>Utility Menu→Plot→Keypoints→Keypoints</code></p></li>
+<li><p>Constraints: <code>Main Menu→Solution→Define Loads→Apply→Structural→Displacement→On Keypoints</code>. Select Keypoint 1 and select ok in the selection box.</p>
+<ol style="list-style-type: decimal">
+<li>Select All DOF, enter 0 in VALUE and then select ok.</li>
+</ol></li>
+<li><p>Loading: <code>Solution→Define Loads→Apply→Structural→Force/Moment→On Keypoints</code>. Select Keypoint 2 and then select ok.</p>
+<ol style="list-style-type: decimal">
+<li>Select <code>FY</code> in <code>Direction of force/mom</code>, <code>Constant value</code>, <code>-10</code> in <code>VALUE</code></li>
+</ol></li>
+<li><p>Solving: <code>Preprocessor→Solution→Solve→Current LS</code></p></li>
+<li><p>Deflection: <code>General Postproc→Plot Results→Deformed Shape</code>; <code>Def + undef edge</code></p></li>
+<li><p>Deflection contour: <code>General Postproc→Plot results→Contour Plot→Nodal Solution→DOF Solution→Displacement vector sum</code>.</p></li>
+<li><p>Stress contour: <code>General Postproc→Plot results→Contour Plot→Nodal Solution→Stress→von Mises stress</code>.</p></li>
+<li><p>Element view: <code>Utility Menu→PlotCtrls→Style→Size and Shape</code>; <code>Display of element</code> <code>on</code></p></li>
+<li><p>Select <code>Dynamic model mode</code> and then rotate the geometry.</p></li>
+<li><p>Y - Deflection contour: <code>General Postproc→Plot results→Contour Plot→Nodal Solution→DOF Solution→Y-Component of displacement</code>.</p></li>
+<li><p>Vector plot: <code>General Postproc→Plot results→Vector Plot→Predefined→DOF Solution→Translation U</code></p></li>
+</ol>

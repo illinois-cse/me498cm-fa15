@@ -1,0 +1,436 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>CS 101—Lab 2</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="./css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<h1 id="finite-element-modeling-with-ansys">Finite Element Modeling with ANSYS</h1>
+<h3 id="course-overview">Course Overview</h3>
+<blockquote>
+︎❖ <em>Objective</em>: Understand course expectations and policies.
+</blockquote>
+<blockquote>
+&quot;An FEA program allows an engineer to make mistakes at a rapid rate of speed. (R. Miller)&quot;
+</blockquote>
+<p>This is important, because a popular tenet of current design thought suggests that you should fail often and fail cheaply—in other words, bring your model in contact with reality as often as you can sustain in order to exploit the corrections that come from</p>
+<p>To a certain extent, I want you to treat everything I suggest in this class as a set of guidelines which can be explored and challenged. Think of the computational environment as itself empirical—it is often easy for you to test small hypotheses and craft working problems which can be compared to each other and to reality. Many questions in the course may thus be answered by the rejoinder—<em>do it!</em></p>
+<h1 id="a-brief-review-of-the-finite-element-method">A Brief Review of the Finite Element Method</h1>
+<blockquote>
+︎❖ <em>Objective</em>: Understand the underlying computational process of the finite element method.
+</blockquote>
+<h3 id="solution-process">Solution Process</h3>
+<p>The basic algorithm for a finite element solution is as follows:</p>
+<ol style="list-style-type: decimal">
+<li>Decompose the elements into structures and write a governing equation relationship (such as force-displacement) for each element.</li>
+<li>Assemble all of the elements to get the governing equation statement for the entire problem, <span class="math">$\underline{\underline{K}} \underline{c} = \underline{F}$</span>.</li>
+<li>Apply the boundary conditions, <span class="math">$\underline{\underline{K}}^{*} \underline{c} = \underline{F}^{*}$</span>.</li>
+<li>Solve the resulting linear system to get the solution <span class="math">$\underline{c}$</span>.</li>
+<li>Post-process this result to extract stress, strain, displacement, and other variables of interest.</li>
+</ol>
+<p>Mathematically, we proceed a bit differently, but it is easier to see where the foregoing steps arise if you have an understanding of the four basic forms of the problem: strong <span class="math">𝕊</span>, weak <span class="math">𝕎</span>, Galerkin <span class="math">𝔾</span>, and matrix <span class="math">𝕄</span>.</p>
+<h4 id="mathbbs-strong-form"><span class="math">𝕊</span> Strong Form</h4>
+<p>The strong form is the canonical mathematical statement of the boundary-value problem which you are accustomed to from your previous engineering studies. The governing equations are stated for the domain, along with boundary conditions.</p>
+<blockquote>
+Given <span class="math"><em>f</em></span>, <span class="math"><em>g</em></span>, <span class="math"><em>h</em></span>, find <span class="math"><em>u</em>(<em>x</em>)</span> such that <br /><span class="math">$$
+\begin{align}
+\frac{\text{d}^{2} u(x)}{\text{d} x^{2}} + f &amp; = 0 &amp; 01 \\
+u(1) &amp; = g \\
+\left. \frac{\text{d} u}{\text{d} x} \right|_{x=0} &amp; = -h \\
+\end{align}
+$$</span><br />
+</blockquote>
+<h4 id="mathbbw-weak-form"><span class="math">𝕎</span> Weak Form</h4>
+<p>The weak form is an equivalent variational statement of the problem. A solution of <span class="math">𝕊</span> satisfies <span class="math">𝕎</span>, and vice versa.</p>
+<p>Integrate by parts to construct the weak form. The weighting functions <span class="math"><em>w</em>(<em>x</em>)</span> are arbitrary as long as they satisfy the homogeneous form of the essential boundary conditions: <span class="math"><em>w</em>(<em>x</em> = 1) = 0</span>. Then the weak statement of the problem is:</p>
+<blockquote>
+For any <span class="math"><em>w</em>(<em>x</em>)</span> such that <span class="math"><em>w</em>(<em>x</em> = 1) = 0</span>, find <span class="math"><em>u</em>(<em>x</em>)</span> such that the following equation is satisfied: <br /><span class="math">$$
+\begin{align}
+\int_{0}^{1} \text{d}x\, \frac{\text{d}w}{\text{d}x} \frac{\text{d}u}{\text{d}x}
+&amp; = \left. w(x) \frac{\text{d}^{2} u(x)}{\text{d} x^{2}} \right|_{x=0}^{1} - \int_{0}^{1} \text{d}x\, \frac{\text{d}^{2} u(x)}{\text{d} x^{2}} w(x) \\
+&amp; = - w(x) f(x) \bigg|_{x=0}^{1} + \int_{0}^{1} \text{d}x\, f(x) w(x) \hspace{1cm}\text{by}\; \frac{\text{d}^{2} u(x)}{\text{d} x^{2}} + f = 0 \\
+\int_{0}^{1} \text{d}x\, \frac{\text{d}w}{\text{d}x} \frac{\text{d}u}{\text{d}x}
+&amp; = \int_{0}^{1} \text{d}x\, w(x) f(x) + h w(0)
+\end{align}
+$$</span><br />
+</blockquote>
+<h4 id="mathbbg-galerkin-form"><span class="math">𝔾</span> Galerkin Form</h4>
+<p>Although the matrix form <span class="math">𝕄</span> is the actual statement of the problem which is solved by the machine, it is the Galerkin form <span class="math">𝔾</span> which dominates the numerics. At this point, we assume a discretization (a mesh) and make approximations as to how we will represent the components of the solution.</p>
+<p>Discretize the domain and approximate <span class="math"><em>u</em></span> and <span class="math"><em>w</em></span> by <span class="math">$\tilde{u}$</span> and <span class="math">$\tilde{w}$</span>.</p>
+<blockquote>
+For any <span class="math">$\tilde{w}(x)$</span> such that <span class="math">$\tilde{w}(x=1)=0$</span>, find <span class="math">$\tilde{u}(x)$</span> such that the following equation is satisfied: <br /><span class="math">$$
+\begin{align}
+\int_{0}^{1} \text{d}x\, \frac{\text{d}w}{\text{d}x} \frac{\text{d}u}{\text{d}x}
+&amp; = \int_{0}^{1} \text{d}x\, w(x) f(x) + h w(0)
+\Rightarrow \\
+\int_{0}^{1} \text{d}x\, \frac{\text{d}\tilde{w}}{\text{d}x} \frac{\text{d}\tilde{u}}{\text{d}x}
+&amp; = \int_{0}^{1} \text{d}x\, \tilde{w}(x) f(x) + h \tilde{w}(0)
+\end{align}
+$$</span><br />
+</blockquote>
+<h4 id="mathbbm-matrix-form"><span class="math">𝕄</span> Matrix Form</h4>
+<p>Although the Galerkin form is approximate, we have not yet specified the discretized approximating functions <span class="math">$\tilde{u}$</span> and <span class="math">$\tilde{w}$</span>. We will treat these as composed of shape functions <span class="math"><em>N</em><sub><em>i</em></sub></span>, which are equal to zero outside of the interval <span class="math"><em>x</em><sub><em>i</em> − 1</sub> ≤ <em>x</em> ≤ <em>x</em><sub><em>i</em> + 1</sub></span>. The form of the shape functions can be varied, but we will here use a linear form: <br /><span class="math">$$
+N_i(x) = \left\{
+\begin{matrix}
+\frac{x-x_{i-1}}{h_{i}}
+\hspace{1cm} &amp; x_{i-1} \leq x \leq x_{i} \\
+\frac{x_{i+1}-x}{h_{i}}
+\hspace{1cm} &amp; x_{i} \leq x \leq x_{i+1} \\
+0 &amp; \text{elsewhere}
+\end{matrix}
+\right.
+\text{.}
+$$</span><br /></p>
+<div class="figure">
+<img src="./img/fea/shape-fns-linear.png" />
+
+</div>
+<p>The given approximating functions use these as a basis: <br /><span class="math">$$
+\begin{align}
+\tilde{u}(x)
+&amp; = \sum_{i=1}^{n+1} c_{i} N_{i}(x) \\
+&amp; = \sum_{i=1}^{n}   c_{i} N_{i}(x) + g N_{n+1}(x) \\ \\
+\tilde{w}(x)
+&amp; = \sum_{i=1}^{n+1} d_{i} N_{i}(x) \\
+&amp; = \sum_{i=1}^{n}   d_{i} N_{i}(x)
+\end{align}
+$$</span><br /> where <span class="math"><em>c</em><sub><em>i</em></sub></span>, <span class="math"><em>d</em><sub><em>i</em></sub></span> are weighting coefficients.</p>
+<p>With these definitions, we are equipped to rewrite the Galerkin form in an equivalent matrix form. Substitute for <span class="math">$\tilde{u}$</span> and <span class="math">$\tilde{w}$</span> in <span class="math">𝔾</span>: <br /><span class="math">$$
+\begin{align}
+\int_{0}^{1} \text{d}x\, \left[
+\left( \sum_{i=1}^{n} d_{i} \frac{\text{d}N_{i}}{\text{d}x} \right)
+\left( \sum_{j=1}^{n} c_{j} \frac{\text{d}N_{j}}{\text{d}x} + g \frac{\text{d}N_{n+1}}{\text{d}x} \right)
+\right]
+&amp; =
+\int_{0}^{1} \text{d}x\, \left[
+\left( \sum_{i=1}^{n} d_{i} N_{i}(x) \right) f
+\right]
++ \sum_{i=1}^{n} d_{i} N_{i}(0)
+\end{align}
+$$</span><br /></p>
+<p>Rewrite this equation as <span class="math">$\sum_{i=1}^{n} d_{i} G_{i}(x) = 0$</span>, where <br /><span class="math">$$
+G_i =
+\sum_{j=1}^{n} \left[
+\int_{0}^{1} \text{d}x\, c_{j} \frac{\text{d}N_{i}}{\text{d}x} \frac{\text{d}N_{j}}{\text{d}x}
+\right]
++ g \left[
+\int_{0}^{1} \text{d}x\, \frac{\text{d}N_{i}}{\text{d}x} \frac{\text{d}N_{n+1}}{\text{d}x}
+\right]
+- \int_{0}^{1} \text{d}x\, N_{i}(x) f
+- h N_{i}(0)
+\text{.}
+$$</span><br /></p>
+<p>Define <br /><span class="math">$$
+\begin{align}
+K_{ij} &amp; \equiv \int_{0}^{1} \text{d}x\, \frac{\text{d}N_{i}}{\text{d}x} \frac{\text{d}N_{j}}{\text{d}x}
+&amp; i,j \in \left\{1, ..., n\right\} \\
+F_{i} &amp; \equiv \int_{0}^{1} \text{d}x\, N_{i}(x) f + h N_{i}(0)
+- g \left[
+\int_{0}^{1} \text{d}x\, \frac{\text{d}N_{i}}{\text{d}x} \frac{\text{d}N_{n+1}}{\text{d}x}
+\right]
+&amp; i \in \left\{1, ..., n\right\} \text{.} \\
+\end{align}
+$$</span><br /></p>
+<p>We can now write the matrix form of the problem, which will be solved using conventional linear-algebraic methods.</p>
+<blockquote>
+Given the coefficient matrix <span class="math">$\underline{\underline{K}}$</span> and vector <span class="math">$\underline{F}$</span>, find <span class="math">$\underline{c}$</span> such that <br /><span class="math">$$
+\underline{\underline{K}} \underline{c} = \underline{F} \text{.}
+$$</span><br />
+</blockquote>
+<h3 id="solution-properties">Solution Properties</h3>
+<p>A solution to either the strong form <span class="math">𝕊</span> or the weak form <span class="math">𝕎</span> will satisfy the other; similarly, solutions to either of the Galerkin form <span class="math">𝔾</span> or the matrix form <span class="math">𝕄</span> (defined over the same basis functions) will satisfy both. The primary approximation is the transformation from the weak formulation <span class="math">𝕎</span> to the approximate Galerkin form <span class="math">𝔾</span>. <br /><span class="math">$$
+\mathbb{S} \leftrightarrow
+\mathbb{W} \leftrightsquigarrow
+\mathbb{G} \leftrightarrow
+\mathbb{M}
+$$</span><br /></p>
+<p>The stiffness matrix <span class="math">$\underline{\underline{K}}$</span> is symmetric, banded, and positive-definite, making it attractive for conventional matrix solution methods.</p>
+<h3 id="example-solutions">Example Solutions</h3>
+<p>Consider the foregoing system with three nodes and two elements. We wish to solve the system by hand for a few values of <span class="math"><em>f</em></span>, <span class="math"><em>g</em></span>, <span class="math"><em>h</em></span>.</p>
+<h4 id="grid-and-shape-functions">Grid and Shape Functions</h4>
+<p><img src="./img/fea/shape-fns-ex1.png" width="200px;" align="right" /> The shape functions are a function of the nodes (here, located equidistant at <span class="math">$x = \left\{0, \frac{1}{2}, 1\right\}$</span>), and not of the equation. <br /><span class="math">$$
+N_1(x) = \left\{
+\begin{matrix}
+\frac{x-0}{\frac{1}{2}}
+\rightarrow &amp;
+1-2x
+\hspace{1cm} &amp; 0 \leq x \leq \frac{1}{2} \\
+0 &amp; &amp; \frac{1}{2} \leq x \leq 1 \\
+\end{matrix}
+\right.
+$$</span><br /> <br /><span class="math">$$
+N_2(x) = \left\{
+\begin{matrix}
+\frac{\frac{1}{2}-x}{\frac{1}{2}}
+\rightarrow &amp;
+2x
+\hspace{1cm} &amp; 0 \leq x \leq \frac{1}{2} \\
+\frac{1-x}{\frac{1}{2}}
+\rightarrow &amp;
+2-2x
+\hspace{1cm} &amp; \frac{1}{2} \leq x \leq 1
+\end{matrix}
+\right.
+$$</span><br /> <br /><span class="math">$$
+N_3(x) = \left\{
+\begin{matrix}
+0 &amp; &amp; 0 \leq x \leq \frac{1}{2} \\
+\frac{x-1}{\frac{1}{2}}
+\rightarrow &amp;
+2x-2
+\hspace{1cm} &amp; \frac{1}{2} \leq x \leq 1 \\
+\end{matrix}
+\right.
+\text{.}
+$$</span><br /></p>
+<h4 id="example-1-f-0-g-0-h-1-n-2">Example 1: <span class="math"><em>f</em> = 0</span>, <span class="math"><em>g</em> = 0</span>, <span class="math"><em>h</em> = 1</span>, <span class="math"><em>n</em> = 2</span></h4>
+The problem statement reduces to
+<blockquote>
+Find <span class="math"><em>u</em>(<em>x</em>)</span> such that <br /><span class="math">$$
+\begin{align}
+\frac{\text{d}^{2} u(x)}{\text{d} x^{2}} &amp; = 0 &amp; 0&lt;x&lt;1 \\
+u(1) &amp; = 0 \\
+\left. \frac{\text{d} u}{\text{d} x} \right|_{x=0} &amp; = -1 \\
+\end{align}
+$$</span><br />
+</blockquote>
+<p>To find the resulting matrix formulation <span class="math">𝕄</span>:</p>
+<p>The matrix elements of <span class="math">$\underline{\underline{K}}$</span> are <br /><span class="math">$$
+\begin{align}
+K_{11} &amp; = \int_{0}^{1} \text{d}x\, \frac{\text{d}N_{1}}{\text{d}x} \frac{\text{d}N_{1}}{\text{d}x}
+= \int_{0}^{\frac{1}{2}} (-2)(-2) = 4x\bigg|_{x=0}^{\frac{1}{2}}
+&amp; = 2 \\
+K_{12} &amp; = K_{21} = \int_{0}^{1} \text{d}x\, \frac{\text{d}N_{1}}{\text{d}x} \frac{\text{d}N_{2}}{\text{d}x}
+= \int_{0}^{\frac{1}{2}} (2)(-2) = -4x\bigg|_{x=0}^{\frac{1}{2}}
+&amp; = -2 \\
+K_{22} &amp; = \int_{0}^{1} \text{d}x\, \frac{\text{d}N_{2}}{\text{d}x} \frac{\text{d}N_{2}}{\text{d}x}
+= \int_{0}^{\frac{1}{2}} (2)(2) + \int_{\frac{1}{2}}^{1} (-2)(-2) = -4x\bigg|_{x=0}^{\frac{1}{2}} + 4x\bigg|_{x=\frac{1}{2}}^{1}
+&amp; = 4 \\
+\end{align}
+$$</span><br /> thus <span class="math">$\underline{\underline{K}} = \left[ \begin{matrix} 2 &amp; -2 \\ -2 &amp; 4 \end{matrix} \right]$</span>.</p>
+<p>The solution vector <span class="math">$\underline{F}$</span> is <br /><span class="math">$$
+\begin{align}
+F_{1} &amp; = \frac{1}{2} N_1(0) = \frac{1}{2} \\
+F_{2} &amp; = \frac{1}{2} N_2(0) = 0 \\
+\end{align}
+$$</span><br /> and <span class="math">$\underline{F} = \left[ \begin{matrix} 1 \\ 0 \end{matrix} \right]$</span>.</p>
+<p>The unknown vector <span class="math">$\underline{c}$</span> is now found as <br /><span class="math">$$
+\begin{align}
+\underline{\underline{K}} \underline{c} &amp; = \underline{F} \Rightarrow \\
+\left[ \begin{matrix} 2 &amp; -2 \\ -2 &amp; 4 \end{matrix} \right] \underline{c}
+&amp; = \left[ \begin{matrix} 1 \\ 0 \end{matrix} \right] \Rightarrow \\
+\underline{c} &amp; = {\left[ \begin{matrix} 2 &amp; -2 \\ -2 &amp; 4 \end{matrix} \right]}^{-1} \times \left[ \begin{matrix} 1 \\ 0 \end{matrix} \right] \\
+\underline{c} &amp; = \left[ \begin{matrix} 1 \\ \frac{1}{2} \end{matrix} \right] \text{.}
+\end{align}
+$$</span><br /></p>
+<p>Substituting the coefficients back into the approximating solution <span class="math">$\tilde{u}$</span> now yields the FEM solution: <br /><span class="math">$$
+\tilde{u}(x) = \sum_{i=1}^{n} c_{i} N_{i}(x) + g N_{n+1}(x)
+= 1 \left\{ \begin{matrix} 1-2x \\ 0 \end{matrix} \right. + \frac{1}{2} \left\{ \begin{matrix} 2x &amp; 0 \leq x \leq \frac{1}{2} \\ 2-2x &amp; \frac{1}{2} \leq x \leq 1 \end{matrix} \right.
+= \left\{ \begin{matrix} 1-2x+x \\ 1-x \end{matrix} \right.
+= 1-x
+$$</span><br /></p>
+<p>The exact solution is <span class="math"><em>u</em> = 1 − <em>x</em></span>, in this case corresponding exactly to the FEM solution.</p>
+<h4 id="example-2-f-in-mathbbr-g-0-h-1-n-2">Example 2: <span class="math"><em>f</em> ∈ ℝ</span>, <span class="math"><em>g</em> = 0</span>, <span class="math"><em>h</em> = 1</span>, <span class="math"><em>n</em> = 2</span></h4>
+For arbitrary real <span class="math"><em>f</em></span>, the problem statement becomes
+<blockquote>
+Find <span class="math"><em>u</em>(<em>x</em>)</span> such that <br /><span class="math">$$
+\begin{align}
+\frac{\text{d}^{2} u(x)}{\text{d} x^{2}} + f &amp; = 0 &amp; 0&lt;x&lt;1 \\
+u(1) &amp; = 0 \\
+\left. \frac{\text{d} u}{\text{d} x} \right|_{x=0} &amp; = -1 \\
+\end{align}
+$$</span><br />
+</blockquote>
+<p>The nodes have not changed, so the shape functions remain the same. As before, we find the components of the matrix solution.</p>
+<p>The matrix elements of the stiffness matrix <span class="math">$\underline{\underline{K}}$</span> remain the same, as they are not a function of the source term <span class="math"><em>f</em></span>.</p>
+<p>The solution vector <span class="math">$\underline{F}$</span> becomes <br /><span class="math">$$
+\begin{align}
+F_{1} &amp; = \int_{0}^{1} \text{d}x\, N_{1}(x) f + 1 \cdot N_1(0) \\
+&amp; = \int_{0}^{\frac{1}{2}} \text{d}x\, (1-2x) f + 1 = 1+\frac{1}{4}f \\
+F_{2} &amp; = \int_{0}^{1} \text{d}x\, N_{2}(x) f + 1 \cdot N_2(0) \\
+&amp; = \int_{0}^{\frac{1}{2}} \text{d}x\, (2x) f + \int_{\frac{1}{2}}^{1} \text{d}x\, (2-2x) f
+= \frac{1}{2} f \\
+\end{align}
+$$</span><br /> and <span class="math">$\underline{F} = \left[ \begin{matrix} 1+\frac{1}{4} f \\ \frac{1}{2} f \end{matrix} \right]$</span>.</p>
+<p>The unknown vector <span class="math">$\underline{c}$</span> is now found as <br /><span class="math">$$
+\begin{align}
+\underline{\underline{K}} \underline{c} &amp; = \underline{F} \Rightarrow \\
+\left[ \begin{matrix} 2 &amp; -2 \\ -2 &amp; 4 \end{matrix} \right] \underline{c}
+&amp; = \left[ \begin{matrix} 1+\frac{1}{4} f \\ \frac{1}{2} f \end{matrix} \right] \Rightarrow \\
+\underline{c} &amp; = {\left[ \begin{matrix} 2 &amp; -2 \\ -2 &amp; 4 \end{matrix} \right]}^{-1} \times \left[ \begin{matrix} 1+\frac{1}{4} f \\ \frac{1}{2} f \end{matrix} \right] \\
+&amp; = {\left[ \begin{matrix} 1 &amp; \frac{1}{2} \\ \frac{1}{2} &amp; \frac{1}{2} \end{matrix} \right]} \times \left[ \begin{matrix} 1+\frac{1}{4} f \\ \frac{1}{2} f \end{matrix} \right] \\
+\underline{c} &amp; = \left[ \begin{matrix} 1+\frac{1}{2} f \\ \frac{1}{2}+\frac{3}{8} f \end{matrix} \right] \text{.}
+\end{align}
+$$</span><br /></p>
+<p>Substituting the coefficients back into the approximating solution <span class="math">$\tilde{u}$</span> now yields the general FEM solution for the case of <span class="math"><em>f</em> ∈ ℝ</span>, <span class="math"><em>g</em> = 0</span>, <span class="math"><em>h</em> = 1</span>, <span class="math"><em>n</em> = 2</span>: <br /><span class="math">$$
+\tilde{u}(x) = \sum_{i=1}^{n} c_{i} N_{i}(x) + g N_{n+1}(x)
+= \left(1+\frac{1}{2} f\right) \left\{ \begin{matrix} 1-2x \\ 0 \end{matrix} \right. + \left(\frac{1}{2}+\frac{3}{8} f\right) \left\{ \begin{matrix} 2x \\ 2-2x \end{matrix} \right.
+= \left\{ \begin{matrix} \left(1+\frac{1}{2}f\right)+\left(-1-\frac{1}{4}f\right)x &amp; 0 \leq x \leq \frac{1}{2} \\ \left(1+\frac{3}{4}f\right)+\left(-1-\frac{3}{4}f\right)x &amp; \frac{1}{2} \leq x \leq 1  \end{matrix} \right. \text{.}
+$$</span><br /></p>
+<p>The exact solution is quadratic: <br /><span class="math">$$
+u(x) = -\frac{f}{2}x^{2}-x+\left(1+\frac{f}{2}\right) \text{.}
+$$</span><br /> The FEM solution approximates this solution along the element intervals and matches the exact solution at the nodes. Some specific cases are plotted in the figure below. (The black grid represents the approximate solution <span class="math">$\tilde{u}(x)$</span>, and the smooth colored surface represents the real solution <span class="math"><em>u</em>(<em>x</em>)</span>.)</p>
+<p><img src="./img/solutions-ex1.png" width="600px;" /></p>
+<hr />
+<h1 id="computer-enabled-fea">Computer-Enabled FEA</h1>
+<blockquote>
+︎❖ <em>Objective</em>: Reproduce finite element method hand calculations in a computational FEM tool and articulate their relation.
+</blockquote>
+Let us now program and solve the foregoing example explicitly using ANSYS Mechanical APDL and compare the results. We first need to determine what physics is represented by our purely mathematical consideration above. Recall the strong form of the problem statement <span class="math">𝕊</span> for our prior set of solution conditions:
+<blockquote>
+Find <span class="math"><em>u</em>(<em>x</em>)</span> such that <br /><span class="math">$$
+\begin{align}
+\frac{\text{d}^{2} u(x)}{\text{d} x^{2}} + 2 &amp; = 0 &amp; 0&lt;x&lt;1 \\
+u(x=1) &amp; = 0 \\
+\left. \frac{\text{d} u}{\text{d} x} \right|_{x=0} &amp; = -1 \\
+\end{align}
+$$</span><br />
+</blockquote>
+<p>This second-order differential equation is much like the heat equation</p>
+<p><br /><span class="math">$$-\alpha\frac{\text{d}^{2} u(x)}{\text{d} x^{2}} + F = 0$$</span><br /></p>
+<p>with thermal diffusivity <span class="math">$\alpha \equiv \frac{k}{C_{\text{P}}\rho}$</span> and a source term <span class="math"><em>F</em></span>, subject to the same boundary conditions (transformed for unit conversions).</p>
+<ul>
+<li><p>Start ANSYS Workbench and drag the <img src="../img/icon-workbench-apdl.png" /><code>Mechanical APDL</code> module from the <em>Toolbox→Component Systems</em> pane to the <em>Project Schematic</em> area. Right-click on <img src="../img/icon-analysis.png" /><code>Analysis</code> and select <code>Open Mechanical APDL...</code>. <img src="./img/workbench.png" /></p></li>
+<li><p>Set the jobname and title to <code>thermal</code>. These options are found on the <em>Toolbar</em> under <code>File</code>.</p></li>
+</ul>
+<h4 id="preprocessor-element-type">Preprocessor: Element Type</h4>
+<ul>
+<li>At the <em>Main Menu</em> (the left-hand panel), select <code>Preprocessor→Element Type→Add/Edit/Delete</code>. In the resulting <em>Element Types</em> dialog box, press the <code>Add...</code> button and select <code>Thermal Mass→3D Conduction 33</code> from the <em>Library of Element Types</em>. This adds the <a href="http://www.ansys.stuba.sk/html/elem_55/chapter4/ES4-33.htm"><code>LINK33</code></a> element type to the simulation,</li>
+</ul>
+<p>The <code>LINK33</code> element requires a cross-sectional area for the calculation.</p>
+<ul>
+<li>Select <code>Preprocessor→Real Constants→Add/Edit/Delete</code>, which opens the <em>Real Constants</em> dialog box. As there are currently no real constants defined, the list reads simply <code>NONE</code>. Press <code>Add...</code> and select <code>LINK33</code>. ANSYS now requests a cross-sectional <code>AREA</code> from you; enter <code>0.01</code> for <span class="math">0.01 m<sup>2</sup></span>.</li>
+</ul>
+<blockquote>
+☞<em>Aside</em>: Recall that ANSYS has no conception of units, and simply relies upon you to ensure that all of your values are couched in consistent terms.
+</blockquote>
+<h4 id="preprocessor-material-properties">Preprocessor: Material Properties</h4>
+<p>The <code>LINK33</code> element requires material properties as well as the real property of <code>AREA</code> just defined. We need to define the values contributing to our definition <span class="math">$F \equiv -f/\alpha = \frac{-f C_{\text{P}}\rho}{k}$</span>; thus we require <span class="math"><em>C</em><sub>P</sub></span>, <span class="math"><em>ρ</em></span>, <span class="math"><em>k</em></span>, and <span class="math"><em>f</em></span>.</p>
+<ul>
+<li><p>Select <code>Preprocessor→Material Props→Material Models</code> to access the <em>Define Material Model Behavior</em> dialog.</p>
+<div class="figure">
+<img src="./img/thermal/dialog-define-material-model-behavior-thermal.png" />
+
+</div>
+<ul>
+<li><span class="math"><em>C</em><sub>P</sub></span>: Under <em>Material Models Available</em>, highlight the option <code>Thermal→Specific Heat</code>. ANSYS requests a value <code>C</code>; enter <code>434</code> for <span class="math">434 J ⋅ kg<sup> − 1</sup> ⋅ K<sup> − 1</sup></span>.</li>
+<li><span class="math"><em>ρ</em></span>: Under <em>Material Models Available</em>, highlight the option <code>Thermal→Density</code>. ANSYS requests a value <code>DENS</code>; enter <code>7854</code> for <span class="math">7854 kg ⋅ m<sup> − 3</sup></span>.</li>
+<li><span class="math"><em>k</em></span>: Under <em>Material Models Available</em>, highlight the option <code>Thermal→Conductivity→Isotropic</code>. ANSYS requests a value <code>KXX</code>; enter <code>60.5</code> for <span class="math">60.5 W ⋅ m<sup> − 1</sup> ⋅ K<sup> − 1</sup></span>.</li>
+<li><p>Your <em>Material Models Defined</em> should now look like this:</p>
+<div class="figure">
+<img src="./img/thermal/dialog-define-material-model-behavior-thermal-all.png" />
+
+</div></li>
+<li><p>Close the <em>Define Material Model Behavior</em> dialog. To double-check our input, on the <em>Toolbar</em> select <code>List→Properties→All Materials</code>. The <em>MPLIST Command</em> dialog appears and we can check the results of our inputs in the preceding steps.</p></li>
+</ul></li>
+<li><p>Select <code>Temperature Units</code> and set these to <code>Celsius</code>.</p></li>
+</ul>
+<blockquote>
+☞<em>Aside</em>: The <a href="http://www.ansys.stuba.sk/html/e-index.htm">Elements Reference Index</a> is a good resource if you are trying to figure out how to use any of these cryptic options like <code>DENS</code> and <code>QRATE</code>.
+</blockquote>
+<h4 id="preprocessor-modeling">Preprocessor: Modeling</h4>
+<p>We now need to define our model. Since we are trying to reproduce similar conditions to the hand-solved model above, we require only two nodes. These will be defined using <em>keypoints</em> as reference anchors.</p>
+<ul>
+<li><p>In the <em>Main Menu</em>, select <code>Preprocessor→Modeling→Create→Keypoints→In Active CS</code>. In the resulting <em>Create Keypoints in Active Coordinate System</em> dialog, input <code>0</code> for both <code>X</code> and <code>Y</code>; leave the other text boxes blank.</p>
+<div class="figure">
+<img src="./img/thermal/dialog-create-keypoints-in-active-coordinate-system.png" />
+
+</div>
+<p>Select <code>Apply</code>, then repeat the process for <span class="math">(0.5, 0)</span> and <span class="math">(1, 0)</span>. Press <code>Cancel</code> to finally close the dialog (pressing <code>OK</code> will create two coincident keypoints at the final location). ANSYS now shows the resulting keypoints in the main plot area.</p>
+<div class="figure">
+<img src="./img/thermal/thermal-keypoints.png" />
+
+</div></li>
+</ul>
+<p>We aren't finished yet; now we need to define the connecting lines over which our mesh will be laid.</p>
+<ul>
+<li><p>In the <em>Main Menu</em>, select <code>Preprocessor→Modeling→Create→Lines→Lines→In Active Coord</code>. The <em>Lines in Active Coord</em> dialog appears and asks you to <code>Pick</code> any two keypoints. Select points 1 and 2; a line appears and turns blue as it is instanced into the model. Repeat this between points 2 and 3, which generates a violet line.</p>
+<div class="figure">
+<img src="./img/thermal/thermal-lines.png" />
+
+</div></li>
+</ul>
+<h4 id="preprocessor-meshing">Preprocessor: Meshing</h4>
+<p>The mesh is overlaid on the geometry model, but we need to specify how many elements should be created per line.</p>
+<ul>
+<li><p>In the <em>Main Menu</em>, select <code>Preprocessor→Meshing→Size Cntrls→ManualSize→Lines→All Lines</code>. The <em>Element Sizes on All Selected Lines</em> dialog appears; input <code>1</code> for <code>NDIV</code>, the number of divisions that should be applied to each line.</p></li>
+<li><p>In the <em>Main Menu</em>, select <code>Preprocessor→Meshing→Mesh→Lines</code>. In the <em>Mesh Lines</em> dialog simply select <code>Pick All</code>. The model is meshed.</p></li>
+</ul>
+<h4 id="preprocessor-loads">Preprocessor: Loads</h4>
+<p>Since there is no dependence on temperature in our set of material properties, our choice of reference values becomes somewhat arbitrary. We will leave the right-hand value as 0, while the left-hand derivative statement must be translated into conduction terms. While we wrote</p>
+<p><br /><span class="math">$$\left. \frac{\text{d} u}{\text{d} x} \right|_{x=0} = -1$$</span><br /></p>
+<p>before, we now need a boundary condition of the form</p>
+<p><br /><span class="math">$$\left. -k \frac{\text{d} u}{\text{d} x} \right|_{x=0} = q_\text{s}'' \text{.}$$</span><br /></p>
+<p>This implies that <span class="math">$\frac{q_\text{s}''}{k} = 1$</span> and thus <span class="math"><em>q</em><sub>s</sub>″ = <em>k</em> = 60.5</span>. (We can get away with playing fast and loose with units precisely because we are rigorously staying in the same SI unit system.)</p>
+<p><br /><span class="math"><em>q</em><sub>s</sub>″ = 60.5 W ⋅ m<sup> − 2</sup></span><br /></p>
+<p>(Note that with an insulating boundary condition this conversion is unnecessary, as 0 on the right-hand side allows one to cancel all units. Also note that this is the first place that using <span class="math"><em>u</em></span> in both statements is really starting to confuse us, since we really do mean different things. Alas.)</p>
+<ul>
+<li><p>In the <em>Main Menu</em>, select <code>Preprocessor→Loads→Define Loads→Apply→Thermal→Temperatures→On Keypoints</code>. In the <em>Apply TEMP on KPs</em> dialog, pick keypoint 3 at the far right-hand side. In the <em>Apply TEMP on Keypoints</em> dialog that results, select the <code>TEMP</code> degree of freedom and specify a <code>VALUE</code> of <code>0</code>.</p></li>
+<li><p>In the <em>Main Menu</em>, select <code>Preprocessor→Loads→Define Loads→Apply→Thermal→Heat Flow→On Keypoints</code>. In the <em>Apply HEAT on KPs</em> dialog, pick keypoint 1 at the far left-hand side. In the <em>Apply HEAT on KPs</em> dialog that results, select the <code>HEAT</code> degree of freedom and specify a <code>VALUE</code> of <code>60.5</code>.</p></li>
+</ul>
+<p>We now reconsider that the starting differential equation. We have defined <span class="math"><em>f</em> ≡  − <em>F</em>/<em>α</em> = 2</span>; this requires <span class="math">$F = -2 \alpha = \frac{-2 k}{C_{\text{P}}\rho} = 3.54 \times 10^{-5} \,\text{K}\cdot\text{s}^{-1}$</span>.</p>
+<blockquote>
+☞<em>Aside</em>: These units may make you uncomfortable. Where does this time dimension come from, for instance‽ Note that we are solving the steady-state or time-independent version; thus the left-hand side of the differential equation faces only zero across the equals sign, and we can arbitrarily add or remove the proportionality unit for time <span class="math">s</span>.
+</blockquote>
+<ul>
+<li>In the <em>Main Menu</em>, select <code>Preprocessor→Loads→Define Loads→Apply→Thermal→Heat Generat→Uniform Heat Gen</code>. ANSYS requests a value <code>HGEN</code>; enter <code>-35.4e-6</code> for <span class="math"> − 3.54 × 10<sup> − 5</sup> s ⋅ m<sup> − 2</sup></span>.</li>
+</ul>
+<h4 id="solution">Solution</h4>
+<ul>
+<li>In the <em>Main Menu</em>, select <code>Solution→Solve→Current LS</code>. Review the <em>Command</em> dialog and then tell ANSYS to solve the system. After a few seconds you are notified that the calculation is complete.</li>
+</ul>
+<h4 id="postprocessor">Postprocessor</h4>
+<ul>
+<li><p>In the <em>Main Menu</em>, select <code>General Postproc→Plot Results→Contour Plot→Nodal Solu</code>. Select <code>Nodal Solution→DOF Solution→Nodal Temperature</code> and <code>Apply</code> to view the temperature heatmap.</p></li>
+<li><p>In the <em>Main Menu</em>, select <code>General Postproc→List Results→Nodal Solution</code>. A table of calculated temperatures by node coordinates appears.</p></li>
+</ul>
+<p>The values we obtain here are wildly unrealistic. Something has clearly gone wrong. But what?</p>
+<h4 id="reconsideration">Reconsideration</h4>
+<p>This stumped me for a while, but I figured out a reasonable hypothesis. Modern ANSYS actually doesn't do well with trivial examples: the way it calculates the flux vector normal to the outlet, for instance (here in the line of the model), requires more nodal values than are here available. But we can backdoor the problem, since we in fact already know what the value <em>should</em> be at the left-hand node from the exact solution obtained earlier. There is nothing dishonorable in this, since our goal is to solve a problem, not to solve it under an arbitrary set of limits.</p>
+<ul>
+<li><p>Delete the old loads by going to <code>Preprocessor→Loads→Define Loads→Delete→All Load Data→All Loads &amp; Opts</code>.</p></li>
+<li><p>Create new boundary conditions in temperature of 2 at the left-hand side and 0 at the right-hand side. Set the heat generation term as well, to the same value as before.</p></li>
+<li><p>Solve the system again and check the results.</p>
+<div class="figure">
+<img src="./img/thermal/thermal-results.png" />
+
+</div></li>
+</ul>
+<h4 id="log">Log</h4>
+<p>Note that there has been a running commentary and output on your activities in the <em>Mechanical APDL 15.0 Output Window</em>, a shell window open behind the main window. This contains information resulting from calculations you carry out as well as (some) executed commands.</p>
+<!-- A.M.D.G. -->
+</div>
+</body>
+</html>
