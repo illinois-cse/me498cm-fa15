@@ -13,9 +13,9 @@ We will make a few simplifying assumptions—for instance, we will model the Eif
 
 ### Element
 
-As the Eiffel tower is constructed like an iron truss, we will use [`LINK180`]() elements.  These are three-dimensional beams that we will use with restricted degrees of freedom.  (We can also use beam elements, which require a cross-sectional profile and area.)  These will have a cross-sectional area of $0.9 \,\text{m} \times 0.9 \,\text{m} = 0.81 \,\text{m}^{2}$.
+As the Eiffel tower is constructed like an iron truss, we will use [`BEAM188`](http://www.ansys.stuba.sk/html/elem_55/chapter4/ES4-188.htm) elements.  These are three-dimensional beams that we will use with restricted degrees of freedom.  These will have a square cross-sectional area of $0.9 \,\text{m} \times 0.9 \,\text{m} = 0.81 \,\text{m}^{2}$ (defined in `Section`).
 
-### keypoints etc.
+### Geometry
 
 The Eiffel tower has a complex connectivity, to say the least.  To type in the keypoints used to define the elements would be prohibitively difficult, so instead I have provided a file, `eiffel-keypoints.txt`, which can be used in conjunction with the `\PREP7` command to input them *en masse*.
 
@@ -57,30 +57,4 @@ If all goes well, you should receive notice that the solution has completed.  If
 
 ##  Postprocessing
 
-In the first place, we simply want to view the displacement resulting from the load on the system.
-
-Next, we'd like to take a look at the resulting stress in the system and find any particularly stressed vertices.
-
-Having looked at these two values graphically, let's now extract the underlying data as a table of numerical values.
-
-`plesol` v. `plnsol`
-http://office.es.ncku.edu.tw/leehh/ANSYS/ANSYS/CAE_Course/Chap567_Commands/PLESOL.htm
-
-
-display real section of beam instead of axial representation
-http://www.cad3d.it/forum1/threads/36246-Problema-con-element-table
-
-postprocessing beam and truss elements
-http://engr.bd.psu.edu/davej/classes/lec_ppbeams.html
-
-http://www.mcadcentral.com/creo-analysis/20705-ansys-workbenck-beam-structure-fea-print.html
-
-
-https://www.youtube.com/watch?v=ZwunfUjUCf4
-
-
-Now we can go back and change various settings:
-
--   change the type of the beam (*i.e.*, replace `LINK180` with [`BEAM188`](http://www.ansys.stuba.sk/html/elem_55/chapter4/ES4-188.htm)
--   change the cross-sectional profile of the beam
--   add a breeze blowing across the tower (requires the full 2D model instead of a symmetric one, found in `eiffel-keypoint-full.txt`)
+Look at the displacement and the stress/strain values.  Extract the underlying data as a table of numerical values.
