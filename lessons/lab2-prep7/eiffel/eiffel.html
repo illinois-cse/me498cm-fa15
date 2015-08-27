@@ -1,0 +1,49 @@
+<h1 id="king-kong">King Kong</h1>
+<div class="figure">
+<img src="./img/king-kong.jpg" />
+
+</div>
+<p>In this project, we will model the effect of King Kong climbing to the top of the Eiffel Tower via displacement and stress calculations. (Now, it is true but irrelevant that King Kong never <em>did</em> climb the Eiffel Tower, but it's just an accident of history that this never happened.)</p>
+<p>The Eiffel tower is a wrought-iron structure weighing 7,300 tonnes<sup><a href="https://en.wikipedia.org/wiki/Eiffel_Tower#Design">Wikipedia</a></sup>. Its characteristic exponential shape derives from Gustave Eiffel's primary concern: resisting the wind effectively. In fact, the tower does so so well that it only sways up to 7 cm in the breeze. (If we have time, we can calculate this effect as well.)</p>
+<p>We will make a few simplifying assumptions—for instance, we will model the Eiffel tower in two dimensions, which allows us to take advantage of an axial symmetry as well.</p>
+<h2 id="preprocessing">Preprocessing</h2>
+<h3 id="element">Element</h3>
+<p>As the Eiffel tower is constructed like an iron truss, we will use <a href="http://www.ansys.stuba.sk/html/elem_55/chapter4/ES4-188.htm"><code>BEAM188</code></a> elements. These are three-dimensional beams that we will use with restricted degrees of freedom. These will have a square cross-sectional area of <span class="math">0.9 m × 0.9 m = 0.81 m<sup>2</sup></span> (defined in <code>Section</code>).</p>
+<h3 id="geometry">Geometry</h3>
+<p>The Eiffel tower has a complex connectivity, to say the least. To type in the keypoints used to define the elements would be prohibitively difficult, so instead I have provided a file, <code>eiffel-keypoints.txt</code>, which can be used in conjunction with the <code>\PREP7</code> command to input them <em>en masse</em>.</p>
+<div class="figure">
+<img src="./img/eiffel-keypoints.png" />
+
+</div>
+<p>Once these have been input, please carefully define the lines according to this image. (This connectivity is not completely true to the real Eiffel tower because in 2D we end up with insufficient degrees of freedom if we don't add a few additional links in.)</p>
+<div class="figure">
+<img src="./img/eiffel-lines.png" />
+
+</div>
+<h3 id="mesh">Mesh</h3>
+<p>The mesh should have a sizing of 1. Then go ahead and mesh all lines.</p>
+<div class="figure">
+<img src="./img/eiffel-mesh.png" />
+
+</div>
+<h3 id="loading">Loading</h3>
+<p>We require three conditions: a symmetry condition along the right-hand side of the tower; fixed supports at the base of the tower; and King Kong himself, straddling the top of the tower.</p>
+<p>Set the rightmost nodes to translate only along the <span class="math"><em>y</em></span>-axis, and fix all degrees of freedom for the base nodes.</p>
+<div class="figure">
+<img src="./img/eiffel-loads.png" />
+
+</div>
+<p>As Mr. Kong's vital statistics are astonishingly hard to come by (he even tends to change relative size from scene to scene much less movie to movie), we are going to assume a standard value of <span class="math">2, 040.8 kg × 9.8 m ⋅ s<sup> − 2</sup> = 20, 000 N</span>. We will split this weight in two (as he stands with two feet abreast the Eiffel Tower, majestic and tragic) and assign <span class="math">10, 000 N</span> of force to a keypoint on each side.</p>
+<div class="figure">
+<img src="./img/eiffel-load-kingkong.png" />
+
+</div>
+<h2 id="solution">Solution</h2>
+<p>First, make sure that you are carrying out a <code>static</code> analysis. Then <code>solve</code> the model.</p>
+<p>If all goes well, you should receive notice that the solution has completed. If you get a &quot;small pivot&quot; error, then you haven't specified all of the lines involved in the geometry above or perhaps all of the loads; check closely, then re-mesh and proceed normally.</p>
+<div class="figure">
+<img src="./img/error-pivot.png" />
+
+</div>
+<h2 id="postprocessing">Postprocessing</h2>
+<p>Look at the displacement and the stress/strain values. Extract the underlying data as a table of numerical values.</p>

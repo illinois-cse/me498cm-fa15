@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Bracket (Solid Modeling)</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+
+<h1 id="bracket-solid-modeling">Bracket (Solid Modeling)</h1>
+<div class="figure">
+<img src="./img/bracket.png" />
+
+</div>
+<p>We have a bracket built from <span class="math">20 mm</span> thick high-carbon steel plate. We wish to model the deformation resulting from forces applied in its intended application. (The original inspiration for this exercise comes from <a href="#Fyfe1999">Fyfe1999</a>.)</p>
+<p>This geometry is the most complex that we've yet seen: the base shape is composed of several rectangles and circles, and has bolt holes removed as well. In order to accomplish this within Mechanical APDL, we will have to use <em>Boolean operations</em>, which allow us to combine or subtract geometric components from a solid model.</p>
+<h2 id="preprocessing">Preprocessing</h2>
+<p>First we need to create the shape itself. We will carry out this process in two stages: first an aggregation of the full shape, then a removal of the bolt holes. Create the following shapes. (Save often, because undoing things is hard in ANSYS!)</p>
+<ul>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Rectangle→By 2 Corners</code>: <span class="math">(0, 0), (80, 100)</span></p></li>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Circle→Solid Circle</code>: <span class="math">(80, 50)<em>r</em>50</span></p></li>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Circle→Solid Circle</code>: <span class="math">(0, 20)<em>r</em>20</span></p></li>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Circle→Solid Circle</code>: <span class="math">(0, 80)<em>r</em>20</span></p></li>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Rectangle→By 2 Corners</code>: <span class="math">( − 20, 20), (0, 80)</span></p></li>
+</ul>
+<div class="figure">
+<img src="./img/geometry-solid.png" />
+
+</div>
+<p>We will now use Boolean operations to merge these areas into one large area.</p>
+<ul>
+<li><code>Preprocessor→Operate→Booleans→Add→Areas</code>: select all five areas and <code>OK</code></li>
+</ul>
+<p>Now remove the bolt holes.</p>
+<ul>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Circle→Solid Circle</code>: <span class="math">(80, 50)<em>r</em>30</span></p></li>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Circle→Solid Circle</code>: <span class="math">(0, 20)<em>r</em>10</span></p></li>
+<li><p><code>Preprocessor→Modeling→Create→Areas→Circle→Solid Circle</code>: <span class="math">(0, 80)<em>r</em>10</span></p></li>
+<li><p><code>Preprocessor→Operate→Booleans→Subtract→Areas</code></p></li>
+</ul>
+<div class="figure">
+<img src="./img/geometry-holes.png" />
+
+</div>
+<p>Now set the element type.</p>
+<ul>
+<li><p><code>Preprocessor→Element Type→Add/Edit/Delete</code>: <code>solid→quad82</code></p>
+<ul>
+<li><p><code>quad82</code> requires <code>Options...</code> to be used properly: set <code>Element Behavior K3</code> to <code>Plane strs w/thk</code> and <code>Extra Element Output K5</code> to <code>nodal stress</code>.</p></li>
+<li><p><code>quad82</code> requires <code>Real Constants</code> as well. Set a <code>thickness</code> of <code>20</code>.</p></li>
+</ul></li>
+<li><p><code>Preprocessor→Material Props→Constant→Isotropic...</code> and set:</p>
+<ul>
+<li><code>Young's modulus</code> to <code>11500</code> (MPa to accord with mm)(</li>
+<li><code>Density</code> to <code>7.854e-06</code></li>
+<li><code>Poisson's ratio (minor)</code> to <code>0.295</code></li>
+<li><code>Shear modulus</code> to <code>80000</code></li>
+<li><code>Emissivity</code> to <code>1</code> (can skip this one really)</li>
+</ul></li>
+</ul>
+<p>Now mesh.</p>
+<ul>
+<li><code>Preprocessor→Meshing→Shape &amp; Size→Global Elem Size...</code>
+<ul>
+<li><code>Size</code> <code>5</code></li>
+</ul></li>
+<li><code>Preprocessor→Meshing→Mesh→Areas</code></li>
+</ul>
+<div class="figure">
+<img src="./img/mesh.png" />
+
+</div>
+<p>We will now apply constraints.</p>
+<ul>
+<li><p><code>Preprocessor→Loads→Apply→Structural→Displacement</code></p>
+<ul>
+<li><p>To do this properly, we need to plot the nodes and use the <code>PlotCtrls</code> menu <code>Pan/Zoom/Rotate</code> option to see the appropriate zones in more detail.</p></li>
+<li><p>Select the inner nodes on the upper small bolt hole and fix <code>All DOF</code> to <code>0.0</code>.</p></li>
+<li><p>Repeat this process with the lower bolt hole.</p></li>
+</ul></li>
+</ul>
+<p>The load will now be applied to the large bolt hole.</p>
+<ul>
+<li><p><code>Preprocessor→Loads→Apply→Force/Moment→On Nodes</code></p>
+<ul>
+<li>At the bottom of the large bolt hole, apply <code>FY</code> of <code>-1000</code>.</li>
+</ul></li>
+<li><p>Plot the elements again.</p></li>
+</ul>
+<p>Now solve the model.</p>
+<h2 id="postprocessing">Postprocessing</h2>
+<ul>
+<li><p><code>General PostProc→Read Results→Last Set</code></p></li>
+<li><p><code>Plot Results→Deformed Shape...</code></p></li>
+<li><p><code>Contour Plot→Nodal Solu...</code>; <code>Stress→von Mises SEQV</code>; explore others as well</p></li>
+</ul>
+<p>Refine the mesh if there is enough time.</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a id="Fyfe1999">Fyfe1999</a>: K. Fyfe, A. Muradali, B. McKay. <a href="https://web.archive.org/web/20090310171327/http://homepages.strath.ac.uk/~clas16/~fyfe/ansys/bracket/bracket.html">2D plane stress bracket tutorial</a>.</li>
+</ul>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Smruthi Davanagere Murali, and Arif Abdullah developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a> (CC-BY-NC).</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>
