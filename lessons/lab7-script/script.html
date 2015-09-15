@@ -1,0 +1,369 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>CS 101—Lab 3</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="./css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<h1 id="ansys-parametric-design-language">ANSYS Parametric Design Language</h1>
+<p>This is where you really see the Fortran aspect of the language shine (or glower, depending on your attitude towards Fortran).</p>
+<h2 id="parameters">Parameters</h2>
+<ul>
+<li>
+<p>Scalar or array variables</p>
+</li>
+<li>
+<p>Names must:</p>
+<ul>
+<li>begin with a letter</li>
+<li>contain only A–Z, 0–9, _</li>
+<li>have 32 characters or less</li>
+<li>be distinct from APDL keywords</li>
+</ul>
+</li>
+<li>
+<p><code>*SET</code> defines parameters (<code>=</code> is shorthand):</p>
+<pre><code>*SET,ABC,-24
+*SET,QR,2.07E11
+*SET,XORY,ABC
+*SET,CPARM,'CASE1'
+
+ABC=-24
+QR=2.07E11
+XORY=ABC
+CPARM='CASE1'
+</code></pre>
+</li>
+<li>
+<p><code>*GET</code> retrieves a value from an item and stores it</p>
+<pre><code>*GET,Par,Entity,ENTNUM,Item1,IT1NUM,Item2,IT2NUM
+
+*GET,BCD,ELEM,97,ATTR,MAT   ! BCD = Material number of element 97
+*GET,V37,ELEM,37,VOLU       ! V37 = volume of element 37
+*GET,EL52,ELEM,52,HGEN      ! EL52 = value of heat generation in element 52
+*GET,OPER,ELEM,102,HCOE,2   ! OPER = heat coefficient of element 102,face2
+*GET,TMP,ELEM,16,TBULK,3    ! TMP = bulk temperature of element 16,face3
+*GET,NMAX,NODE,,NUM,MAX     ! NMAX = maximum active node number
+*GET,HNOD,NODE,12,HGEN      ! HNOD = value of heat generation at node 12
+*GET,COORD,ACTIVE,,CSYS     ! COORD = active coordinate system number
+</code></pre>
+</li>
+<li>
+<p><code>*STATUS</code> lists parameters</p>
+</li>
+<li>
+<p><code>*SET,QR,</code> or <code>QR=</code> deletes a parameter</p>
+</li>
+</ul>
+<h2 id="scalars">Scalars</h2>
+<ul>
+<li>
+<p>Character parameters (strings) can only contain eight characters or less.  Name your macros accordingly if you want to load them.</p>
+</li>
+<li>
+<p>Undefined parameters are given a value of $2^{-100}$ <em>without warning</em>.</p>
+</li>
+<li>
+<p>Parameter Substitution</p>
+<pre><code>/TITLE, TEMPERATURE CONTOURS AT TIME=%TM%
+
+A='TEST'
+B='.RST'
+C='/ANSYS'
+D='/MODELS/'
+/STITLE,,RESULTS FROM FILE %C%%D%%A%%B%
+/POST1
+FILE,A,RST,%C%%D%      ! Read results from /ANSYS/MODELS/TEST.RST
+</code></pre>
+<p>yields</p>
+<pre><code>  SUBTITLE  1 =
+  RESULTS FROM FILE /ANSYS/MODELS/TEST.RST
+</code></pre>
+</li>
+<li>
+<p><code>*ASK</code> requests alphanumeric string from user</p>
+</li>
+<li>
+<p><code>*VWRITE</code> writes formatted character data to disk</p>
+</li>
+<li>
+<p>Expressions are valid:</p>
+<pre><code>X=A+B
+P=(R2+R1)/2
+D=-B+(E**2)-(4*A*C) ! Evaluates to D = -B + E**2 - 4AC
+XYZ=(A&lt;B)+Y**2      ! Evaluates to XYZ = A + Y**2 if A is less than B;
+                    ! otherwise to XYZ = B + Y**2
+INC=A1+(31.4/9)
+M=((X2-X1)**2-(Y2-Y1)**2)/2
+</code></pre>
+<ul>
+<li><code>SIN</code>, <code>LOG10</code>, <code>RAND</code>, <code>CXABS</code>, <code>VALCHR</code> are representative functions</li>
+</ul>
+</li>
+<li>
+<p><code>PARSAV</code> writes your set of parameters to disk; <code>PARRES</code> loads them</p>
+</li>
+</ul>
+<h2 id="arrays">Arrays</h2>
+<ul>
+<li>
+<p>Arrays are arranged (in increasing order of dimensionality):  column, row, plane, book, shelf</p>
+</li>
+<li>
+<p>Arrays index from 1; tables index from 0 (index values)</p>
+</li>
+<li>
+<p><code>*DIM</code> creates an array</p>
+<pre><code>*DIM,AA,,4          ! Type ARRAY is default, dimension 4[x1x1]
+*DIM,XYZ,ARRAY,12   ! Type ARRAY array, dimension 12[x1x1]
+*DIM,FORCE,TABLE,5  ! Type TABLE array, dimension 5[x1x1]
+*DIM,T2,,4,3        ! Dimensions are 4x3[x1]
+*DIM,CPARR1,CHAR,5  ! Type CHAR array, dimension 5[x1x1]
+</code></pre>
+</li>
+<li>
+<p><code>*SET</code>, <code>*VFILL</code>, <code>*VEDIT</code>, <code>*VREAD</code>, <code>*TREAD</code> fill arrays with values</p>
+<pre><code>XYZ(1)=59.5,42.494,-9.01,-8.98,-8.98,9.01,-30.6,51
+XYZ(9)=-51.9,14.88,10.8,-10.8
+
+T2(1,1)=.6,2,-1.8,4         ! defines (1,1),(2,1),(3,1),(4,1)
+T2(1,2)=7,5,9.1,62.5        ! defines (1,2),(2,2),(3,2),(4,2)
+T2(1,3)=2E-4,-3.5,22,.01    ! defines (1,3),(2,3),(3,3),(4,3)
+
+FORCE(1)=0,560,560,238.5,0
+FORCE(1,0)=1E-6,.8,7.2,8.5,9.3
+
+*DIM,RESULT,CHAR,3       !Character array parameter with dimensions (3,1,1)
+RESULT(1)='SX','SY','SZ'  !Assigns values to parameter RESULT
+
+*DIM,DTAB,ARRAY,4,3                 ! dimension 4 x 3 numeric array
+*VFILL,DTAB(1,1),DATA,-3,8,-12,57   ! four data values loaded into vector 1
+*VFILL,DTAB(1,2),RAMP,2.54,2.54     ! fill vector 2 with values starting at
+                                    ! 2.54 and incrementing by 2.54
+*VFILL,DTAB(1,3),RAND,1.5,10        ! fill vector 3 with random numbers between
+                                    ! 1.5 and 10.  Results will vary due to
+                                    ! random number generation.
+
+*DIM,EXAMPLE,,2,3
+*VREAD,EXAMPLE(1,1),dataval,,,JIK,3,2
+(3F6.1)
+!or use Utility Menu&gt; Parameters&gt; Array Parameters&gt; Read from File
+
+(for a file named dataval)
+1.5 7.8 12.3
+15.6  -45.6  42.5
+
+*DIM,Ttx,table,4,5,,time,X-COORD
+*TREAD,Ttx,t2data,txt,,2
+!or use Utility Menu&gt; Parameters&gt; Array Parameters&gt; Define/Edit
+</code></pre>
+</li>
+<li>
+<p>Vector operations are available:  <code>*VOPER</code>, <code>*VFUN</code>, <code>*VSCFUN</code>, *VITRP`</p>
+</li>
+<li>
+<p>Matrix operations are available:  <code>*MOPER</code>, <code>*MFUN</code>, <code>*MFOURI</code></p>
+</li>
+<li>
+<p><code>*VPLOT</code>, <code>/GCOLUMN</code></p>
+</li>
+</ul>
+<h2 id="mathematics">Mathematics</h2>
+<ul>
+<li>
+<p>Support for a range of linear-algebraic operations is available.</p>
+</li>
+<li>
+<p>For instance, you can verify that the modes obtained from a <code>MODAL</code> analysis are indeed orthogonal:</p>
+<pre><code>! PERFORM A STANDARD MODAL ANALYSIS /SOLU
+MODOPT,lanb,10
+SOLVE
+FINISH
+
+! READ M AND Nod2Bcs MATRICES FROM THE FULL FILE
+*SMAT,MassMatrix,D,IMPORT,FULL,file.full,MASS
+*SMAT,NodToBcs,D,IMPORT,FULL,file.full,NOD2BCS
+
+! READ THE MODE SHAPES FROM THE MODE FILE
+*DMAT,Phi,D,IMPORT,MODE,file.mode
+
+! CONVERT THEM TO THE BCS ORDERING
+*MULT,NodToBcs,,Phi,,BCSPhi
+
+! CREATE PhiTMPhi = (Phi)T*M*Phi
+*MULT,MassMatrix,,BCSPhi,,APhi
+*MULT,BCSPhi,TRANS,APhi,,PhiTMPhi
+
+! PRINT THIS MATRIX: IT SHOULD BE THE IDENTITY MATRIX [I]
+*PRINT,PhiTMPhi,PhiTMPhi.txt
+</code></pre>
+</li>
+</ul>
+<h2 id="macros">Macros</h2>
+<ul>
+<li>
+<p>Macros are frequently used sets of APDL commands which you record and play back as necessary.  (They are useful in postprocessing, for instance.)</p>
+</li>
+<li>
+<p>Macro file names have similar restrictions to parameter names, but should have the <code>.MAC</code> file suffix.  They are invoked as follows:</p>
+<pre><code>*use,mymacro
+*use,/home/netid/mymacro.mac
+</code></pre>
+<p>ANSYS will search your home directory and the working directory for scripts.  (There is also a <code>ANSYS_MACROLIB</code> environment variable that can be set in *nix environments.)</p>
+</li>
+<li>
+<p>There are several ways to create macros.  Two of the most useful:</p>
+<ul>
+<li>
+<p><code>*CREATE</code> writes commands to disk until the <code>*END</code> command is issued.  (These commands are not executed.)</p>
+</li>
+<li>
+<p><code>/TEE</code> writes commands to disk at the same time they are executed in the current APDL session</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Several macros can be stored in a single file:</p>
+<pre><code>mybloc
+/prep7
+/view,,-1,-2,-3
+block,,4,,3,,2
+finish
+/EOF
+mysphere
+/prep7
+/view,,-1,-2,-3
+sphere,1
+finish
+/EOF
+</code></pre>
+</li>
+<li>
+<p>Macros can accept arguments (called <code>arg1</code> through <code>arg19</code>).</p>
+<pre><code>/prep7
+/view,,-1,-2,-3
+block,,arg1,,arg2,,arg3
+sphere,arg4
+vsbv,1,2
+finish
+
+mymacro,4,3,2.2,1
+</code></pre>
+</li>
+<li>
+<p>Values can be retrieved from macros using <code>_STATUS</code> and <code>_RETURN</code>.</p>
+<pre><code>0 for no error
+1 for a note
+2 for a warning
+3 for an error
+</code></pre>
+</li>
+</ul>
+<h3 id="program-flow-control">Program Flow Control</h3>
+<ul>
+<li>
+<p>Call subroutines (other macros)</p>
+</li>
+<li>
+<p>Branch unconditionally (<code>*GO</code>)</p>
+<pre><code>*GO,:BRANCH1
+---    ! This block of commands is skipped (not executed)
+---
+:BRANCH1
+---
+---
+</code></pre>
+</li>
+<li>
+<p>Branch conditionally (<code>*IF</code>)</p>
+<pre><code>*IF,A,EQ,1,THEN
+    ! Block 1
+    ---
+*ELSEIF,A,EQ,0
+    ! Block 2
+    ---
+*ELSEIF,A,EQ,-1
+    ! Block 3
+    ---
+*ELSE
+    ! Block 4
+    ---
+*ENDIF
+</code></pre>
+<ul>
+<li>Operators include:  <code>EQ</code>, <code>NE</code>, <code>LT</code>, <code>GT</code>, <code>LE</code>, <code>GE</code></li>
+</ul>
+</li>
+<li>
+<p>Looping (<code>*REPEAT</code>, <code>*DO</code>, <code>*WHILE</code>)</p>
+<ul>
+<li>
+<p><code>*REPEAT</code>ing a command (with increments on commands)</p>
+<pre><code>E,1,2
+*REPEAT,5,0,1
+</code></pre>
+<p>yields five nodes with connectivies 1–2, 1–3, 1–4, 1–5</p>
+</li>
+<li>
+<p><code>*DO</code> loops</p>
+<pre><code>*DO,I,1,5       ! For I = 1 to 5:
+LSREAD,I        ! Read load step file I
+OUTPR,ALL,NONE  ! Change output controls
+ERESX,NO
+LSWRITE,I       ! Rewrite load step file I
+*ENDDO
+</code></pre>
+</li>
+<li>
+<p>Implied <code>*DO</code> loops</p>
+<pre><code>n,(1:6),(2:12:2)
+</code></pre>
+</li>
+<li>
+<p><code>*DOWHILE</code> loops</p>
+<pre><code>*DOWHILE,Param
+--- (logic that changes Param from TRUE to FALSE)
+*ENDDO
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="reference">Reference</h2>
+<ul>
+<li>ANSYS Parametric DesignLanguage Guide</li>
+</ul></div>
+</body>
+</html>
