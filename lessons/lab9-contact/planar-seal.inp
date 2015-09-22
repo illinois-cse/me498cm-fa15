@@ -1,0 +1,185 @@
+/title,Seal compression with fluid pressure-penetration loading
+/com  =====================================================================
+/com   OBJECTIVE:
+/com   The objective of this test is to verify the path of fluid
+/com   penetration pressure with rigid-flex contact
+/com   and CONTA171 default keyoptions.
+/com
+/com   DESCRIPTION:
+/com   The model represents a planar seal that is compressed. Fluid
+/com   pressure is applied to all contact elements so that the fluid
+/com   penetrates and opens the contact that used to be closed by
+/com   compression.
+/com
+/com   The fluid pressure is applied after the compression, and one
+/com   starting point is chosen to be initially in fluid (STA=1 on SFE).
+/com   From this location the fluid penetrates gradually at the bottom
+/com   surface.
+/com
+/com   TEST SPECIFICATIONS:
+/com   SOLID ELEMENTS: PLANE182 - PLANE STRESS
+/com   TARGET ELEMENT: TARGE169
+/com   CONTACT ELEMENT: CONTA171, K(14)=0, K(2)=0, K(4)=0
+/com   MATERIAL MODEL: HYPERELASTIC
+/com
+/com
+/com   RESULTS:
+/com   At the end of load step 1 there are 3 regions where contact is
+/com   closed at the bottom surface. One element from each of these
+/com   regions is chosen, and the time history results for fluid
+/com   contact pressure and gap are printed and plotted to show the
+/com   path of fluid penetration along the bottom contact elements.
+/com   Notice that at the time when the contact opens
+/com   (gap is not zero), the FPRS is nonzero.
+/com  =====================================================================
+
+/prep7
+et,1,182  ! PLANE182 with plane stress option
+
+tb,HYPER,1,1,2,MOON
+tbtemp,0
+tbdata,,80,20,0,,,
+
+/com  **** Build the model ****
+
+k,1
+k,2,0.333,0
+k,3,0.867,0.867
+k,4,1.1,0.867
+k,5,1.1,1
+k,6,0.8,1
+k,7,0.267,0.133
+k,8,0,0.133
+l,1,2
+*repeat,7,1,1
+l,8,1
+lfillt,1,2,0.20
+lfillt,2,3,0.15
+lfillt,5,6,0.20
+lfillt,6,7,0.15
+lfillt,7,8,0.05
+lfillt,8,1,0.05
+al,all
+k,98,-1.0,0
+k,99,1.1,0
+lstr,99,98
+k,100,-1.0,1.0
+k,101,1.1,1.0
+lstr,100,101
+
+lcomb,8,13
+lcomb,8,14
+
+esize,0.02  ! Set element attributes and meshing parameters
+type,1
+mat,1
+smrtsize,5
+
+amesh,all  ! Mesh the model
+allsel
+
+lsel,s,,,4  ! BCs to model half symmetry
+nsll,s,1
+d,all,ux,0
+allsel
+
+/com  **** Contact pair creation ****
+
+et,2,169
+et,3,171
+keyopt,3,10,2
+mp,mu,2,0.2  ! Friction
+
+r,2
+
+/com  **** Top and bottom rigid targets ****
+
+type,2
+real,2
+mat,2
+lesize,15,,,1
+lesize,16,,,1
+lmesh,15,16
+
+/com  **** Contact on the planar seal ****
+
+lsel,s,line,,1,12
+lsel,u,line,,4
+
+nsll,s,1
+type,3
+esurf
+
+allsel,all
+finish
+
+/solu
+allsel
+
+esel,s,ename,,169
+nsle
+nsel,r,loc,y,1
+d,all,uy,-0.865  ! Move top rigid target
+
+nlgeom,on
+time,1
+nsubst,25,2000,5
+outres,all,all
+allsel
+nropt,unsym  ! Unsymmetric due to friction
+solve
+
+esel,s,ename,,171 ! Select only contact elements
+sfe,all,1,PRES, ,150 ! Apply fluid pressure of 150 to all contact elements
+sfe,all,2,pres,,-1 ! Suppress default starting points (STA1 = -1)
+
+nsel,s,loc,x  ! Select a location for starting points
+esln
+esel,r,ename,,171 ! Reselect only the contact elements
+sfe,all,2,pres,,1 ! Specify the above location to be initially in fluid (STA1 = 1)
+
+allsel
+
+nsubst,100,1000,10
+solve
+finish
+
+/com  **** Post1 postprocessing ****
+
+/post1
+/show
+set,2,last
+finish
+
+/com  **** Post26 time history postprocessing ****
+
+/post26
+timerange,1,2
+
+esol,2,523,138 ,cont,fprs,CONTFPRS1
+esol,3,523,138 ,cont,gap,CONTGAP1
+/com *****************************************************************************
+/com History of contact gap and fluid pressure for an element in the
+/com region that opens first
+/com *****************************************************************************
+prvar,2,3
+esol,4,578,53 ,cont,fprs,CONTFPRS2
+esol,5,578,53 ,cont,gap,CONTGAP2
+/com ****************************************************************************
+/com History of contact gap and fluid pressure for an element in the
+/com region that opens later
+/com *****************************************************************************
+prvar,4,5
+esol,6,517,6,cont,fprs,CONTFPRS3
+esol,7,517,6,cont,gap,CONTGAP3
+/com ****************************************************************************
+/com History of contact gap and fluid pressure for contact element
+/com that opens last
+/com *****************************************************************************
+prvar,6,7
+
+/title,Time history of fluid pressure for three contact elements
+/axlab,y,Fluid pressure
+plvar,2,4,6
+
+finish

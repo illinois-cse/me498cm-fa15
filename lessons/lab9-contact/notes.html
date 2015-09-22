@@ -1,0 +1,159 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>ME 498CM—Contact Mechanics</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="./css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<h1 id="contact-mechanics">Contact Mechanics</h1>
+<p>The finite element method is well-adapted to solve continuum problems, both static and time-varying, for mechanical, thermal, and multiphysics cases. However, contact (interface) problems are <em>discontinuous</em>, thus requiring special treatment mathematically and algorithmically.</p>
+<p>In pure FEM, we have simply applied body forces or surface and point loads to simulate the effects of support, crushing, and other contacts. This is a good assumption when forces arise due to acceleration, contact by a relatively hard or soft body, or are stress-induced by thermal effects. But in many other cases, the objects in contact are of somewhat similar mechanical properties and capable of deforming each other directly. In cases like component assembly, rolling contact, forming processes, crash tests, and articulated joints, special treatment of the contacting surfaces is critical to the success of the simulation.</p>
+<ul>
+<li>Naïvely, how might you try to deal with this situation?</li>
+</ul>
+<p>From a computational standpoint, contact problems are challenging due to two demands:</p>
+<ol style="list-style-type: decimal">
+<li><p>The regions of contact are unknown prior to solution. &quot;Depending on the loads, material, boundary conditions, and other factors, surfaces can come into and go out of contact with each other in a largely unpredictable and abrupt manner.&quot;</p></li>
+<li><p>Contact problems must account for friction, and almost all friction models and laws are nonlinear and chaotic. This makes solution convergence very difficult.</p></li>
+</ol>
+<p>These are both <em>besides</em> field effects, such as thermal or electrical effects. <em>There is an entire guide on contact mechanics problems in the documentation.</em></p>
+<p>The two classes of contact problems are rigid-to-flexible and flexible-to-flexible. In the first, one or more surfaces are treated as rigid (high stiffness) relative to the others.</p>
+<blockquote>
+To model a contact problem, you first must identify the parts to be analyzed for their possible interaction. If one of the interactions is at a point, the corresponding component of your model is a node. If one of the interactions is at a surface, the corresponding component of your model is an element: either a beam, shell, or solid element. The finite element model recognizes possible contact pairs by the presence of specific contact elements.
+</blockquote>
+<p>The common steps in an analysis are:</p>
+<ol style="list-style-type: decimal">
+<li><p>Create the model geometry and mesh</p></li>
+<li><p>Identify the contact pairs</p>
+<blockquote>
+<p>You must identify where contact might occur during the deformation of your model. Once you've identified potential contact surfaces, you define them via target and contact elements, which will then track the kinematics of the deformation process. Target and contact elements that make up a contact pair are associated with each other via a shared real constant set.</p>
+The contact zone can be arbitrary; however, for the most efficient solution (primarily in CPU time), you may want to define smaller, localized contacting zones, but be sure your zones are adequate to capture all necessary contact. Different contact pairs must be defined by a different real constant set, even if the element real constant values do not change.
+</blockquote></li>
+<li><p>Designate contact and target surfaces</p>
+<blockquote>
+Contact elements are constrained against penetrating the target surface. However, target elements can penetrate through the contact surface. For rigid-to-flexible contact, the designation is obvious: the target surface is always the rigid surface and the contact surface is always the deformable surface. For flexible-to-flexible contact, the choice of which surface is designated contact or target can cause a different amount of penetration and thus affect the solution accuracy.
+</blockquote>
+<p>This leads us into the problem of asymmetric <em>v.</em> symmetric contact. <em>Asymmetric contact</em> occurs when one has all contact elements on one surface and all target elements on the other. This is the most computationally efficient solution scenario, as it lets the machine calculate the contact constraints in one pass.</p>
+<blockquote>
+<p>Consider the following guidelines when designating the surfaces:</p>
+<ul>
+<li><p>If a convex surface is expected to come into contact with a flat or concave surface, the flat/concave surface should be the target surface.</p></li>
+<li><p>If one surface has a fine surface mesh and, in comparison, the other has a coarse mesh, the fine mesh should be the contact surface and the coarse mesh should be the target surface.</p></li>
+<li><p>If one surface is stiffer then the other, the softer surface should be the contact surface and the stiffer surface should be the target surface.</p></li>
+<li><p>If higher-order elements underly one of the external surfaces and lower-order elements underly the other surface, the surface with the underlying higher-order elements should be the contact surface and the other surface should be the target. However, for 3-D node-to-surface contact, the lower-order elements should be the contact surface. The higher-order elements should be the target surface.</p></li>
+<li><p>If one surface is markedly larger than the other surface, such as in the instance where one surface surrounds the other surface, the larger surface should be the target surface.</p></li>
+<li>In the case of 3-D internal beam-to-beam contact modeled by CONTA176 (a beam or pipe sliding inside another hollow beam or pipe), the inner beam should be considered the contact surface and the outer beam should be the target surface. However, when the inner beam is much stiffer than the outer beam, the inner beam can be the target surface.</li>
+</ul>
+</blockquote>
+<p>(These can be applied automatically by ANSYS.)</p>
+<p>Intersurface penetration can still occur in some cases with these constraints in asymmetric contact, so symmetric contact is often necessary.</p>
+<blockquote>
+<p>Specific situations that require symmetric contact include models where</p>
+<ul>
+<li><p>The distinction between the contact and target surfaces is not clear.</p></li>
+<li>Both surfaces have very coarse meshes. (The symmetric contact algorithm enforces the contact constraint conditions at more surface locations than the asymmetric contact algorithm.)</li>
+</ul>
+</blockquote></li>
+<li><p>Define the target surface</p>
+<blockquote>
+<p>Low-order target elements result in &quot;cheaper&quot; CPU usage in getting penetration and gap; however, the meshed surface may not be smooth. Higher-order target elements are more &quot;expensive&quot; to use in getting the penetration and gap, but they need many fewer elements to discretize the whole curved target surface.</p>
+<p>The node order of the target surface elements is critical because it defines contact direction. For 2-D contact, the associated (deformable) contact elements must lie to the right of the target surface when moving from the first node to the second node along the target surface line.</p>
+<p>To check the direction of the normals, turn on the element coordinate systems. <code>Utility Menu→PlotCtrls→Symbols</code>.</p>
+If the element normals do not point toward the contact surface, select this element and reverse the direction of the surface normals. <code>Main Menu→Preprocessor→Modeling→Create→Elements→Surf/Contact→Surf to Surf</code>
+</blockquote>
+<p>The pilot node is ***</p></li>
+<li><p>Define the contact surface</p>
+<blockquote>
+<p>The contact surface is defined by the set of contact elements that comprise the surface of the deformable body. These contact elements have the same geometric characteristics as the underlying elements of the deformable body. The contact surface elements are of the same order as the underlying elements (lower- or higher-order), with compatible nodes along the edges. The higher-order contact elements can match lower-order underlying elements by dropping the midside nodes. The underlying elements can be solid, shell, beam, or pipe elements.</p>
+In general, curved contact and target surfaces can be well approximated by linear (lower order) or quadratic (higher order) contact and target elements when the mesh is sufficiently refined. However, in certain circumstances this is not the case; for example, when linear elements are used or when the midside nodes of quadratic elements do not lie exactly on the initial curved geometry because a third party mesh generator was used. Thus, in some contact applications, using a faceted surface in place of the true curved geometry can significantly affect the accuracy of contact stresses. Geometry correction is most beneficial for small deflection analyses (small or large sliding).
+</blockquote></li>
+<li><p>Set the element <code>KEYOPT</code>s and real constants</p></li>
+<li><p>Define/control the motion of the target surface (rigid-to-flexible only)</p>
+<p>Several contact algorithms are available (see below). The location of contact detection is also specifiable. (This always occurs at the Gaussian integration points, but you can specify how they interact.) There may be some minor interpenetration of surfaces in edge cases, but if this is significant (in corners, for instance), you can specify nodal contact constraint. (But be careful of nodal slippage!)</p>
+<p>A few friction models are available (see below).</p>
+<p>Automatic option, such as contact surface adjustment, are also available.</p>
+<p>Surface-to-surface contact models are also included.</p></li>
+<li><p>Apply necessary boundary conditions</p></li>
+<li><p>Apply fluid pressure-penetration loads</p></li>
+<li><p>Define solution options and load steps</p></li>
+<li><p>Solve the contact problem</p></li>
+<li><p>Review the results</p></li>
+</ol>
+<p>All of these steps can be carried out either programmatically or via the user interface. In this case, the documentation specifically recommends that you use the user interface, since the correct assignment of target and contact surfaces is paramount.</p>
+<p>Other methods to consider include spot welds, in which a node is attached to two meshes.</p>
+<h3 id="contact-algorithms">Contact algorithms</h3>
+<ul>
+<li><p>Penalty method</p>
+<p>The penalty method uses a contact &quot;spring&quot; to establish a relationship between the two contact surfaces. The spring stiffness is called the contact stiffness.</p></li>
+<li><p>Augmented Lagrangian (default)</p>
+<p>The augmented Lagrangian method is an iterative series of penalty methods. The contact tractions (pressure and frictional stresses) are augmented during equilibrium iterations so that the final penetration is smaller than the allowable tolerance. Compared to the penalty method, the augmented Lagrangian method usually leads to better conditioning and is less sensitive to the magnitude of the contact stiffness. However, in some analyses, the augmented Lagrangian method may require additional iterations, especially if the deformed mesh becomes too distorted.</p></li>
+<li><p>Lagrange multiplier on contact normal and penalty on tangent</p>
+<p>The pure Lagrange multiplier method enforces zero penetration when contact is closed and &quot;zero slip&quot; when sticking contact occurs. The pure Lagrange multiplier method does not require contact stiffness. Instead it requires chattering control parameters. This method adds contact traction to the model as additional degrees of freedom and requires additional iterations to stabilize contact conditions. It often increases the computational cost compared to the augmented Lagrangian method.</p></li>
+<li><p>Pure Lagrange multiplier on contact normal and tangent</p>
+<p>An alternative algorithm is the Lagrange multiplier method applied on the contact normal and the penalty method (tangential contact stiffness) on the frictional plane. This method enforces zero penetration and allows a small amount of slip for the sticking contact condition. It requires chattering control parameters, as well as the maximum allowable elastic slip parameter.</p></li>
+<li><p>Internal multipoint constraint (MPC)</p>
+<p>Another method, the internal multipoint constraint (MPC) algorithm, is used in conjunction with bonded contact and no separation contact to model several types of contact assemblies and kinematic constraints.</p></li>
+</ul>
+<p>The standard penalty contact algorithm assesses contact surfaces independently and yields a simply summation of forces across nodes but dissipates energy mathematically. Higher-order contact algorithms treat surfaces as a coupled system; the iterative force calculation is more accurate and conserves energy.</p>
+<p>Contact chattering can occur if the contact is actually <em>well</em>-meshed: in this case, the convergence rate is extremely poor. One way to deal with this is to offset the nodes of one mesh between the nodes of the other side.</p>
+<h3 id="friction-algorithms">Friction algorithms</h3>
+<ul>
+<li><p>Coulomb friction, τ = μ p + COHE. The Coulomb friction model defines an equivalent shear stress τ, at which sliding on the surface begins as a fraction of the contact pressure p, where μ is the friction coefficient and <code>COHE</code> specifies the cohesion sliding resistance.</p></li>
+<li><p>Exponential decay friction, μ = MU × (1 + (FACT - 1) exp(-DC × Vrel)) where: μ = coefficient of friction. <code>MU</code> = dynamic coefficient of friction. <code>FACT</code> = ratio of static to dynamic coefficients of friction. It defaults to the minimum value of 1.0 <code>DC</code> = decay coefficient, which has units of time/length. Therefore, time has some meaning in a static analysis. DC defaults to zero. When DC is zero, the equation is rewritten to be μ = MU for the case of sliding and μ = FACT*MU for the case of sticking. Vrel = slip rate calculated by the program.</p></li>
+</ul>
+<p>These are also interpreted in light of the fact that you can assign velocities to bodies and monitor forced frictional sliding.</p>
+<h3 id="surface-contact-models">Surface contact models</h3>
+<ul>
+<li><p>standard unilateral contact: normal pressure equals zero if separation occurs.</p></li>
+<li><p>perfectly rough frictional contact without sliding. This case corresponds to an infinite friction coefficient and ignores the material property <code>MU</code>.</p></li>
+<li><p>no separation contact: the target and contact surfaces are tied (although sliding is permitted) for the remainder of the analysis once contact is established.</p></li>
+<li><p>no separation contact: contact detection points that are either initially inside the pinball region or that once involve contact always attach to the target surface along the normal direction to the contact surface (sliding is permitted).</p></li>
+<li><p>bonded contact: the target and contact surfaces are bonded in all directions (once contact is established) for the remainder of the analysis.</p></li>
+<li><p>bonded contact: contact detection points that are either initially inside the pinball region or that once involve contact always attach to the target surface along the normal and tangent directions to the contact surface (fully bonded).</p></li>
+<li><p>bonded contact: contact detection points that are initially in a closed state will remain attached to the target surface and the contact detection points that are initially in an open state will remain open throughout the analysis.</p></li>
+</ul>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li><p><a href="http://www.padtinc.com/blog/the-focus/20-apdl-commands-every-ansys-mechanical-user-should-know">20 APDL commands every user should know</a></p></li>
+<li><p><a href="http://feaskill.com/fea-interview-questions-related-to-contact-modelling/">Interview questions about contact modeling</a> (There are other good question sets on this site as well regarding FEA simulations which you should examine if you took this course for professional development reasons.)</p></li>
+</ul>
+<h3 id="references">References</h3>
+<ul>
+<li><a href="Yastrebov2010">Yastrebov2010</a>: V. A. Yastrebov (2010) <a href="http://mms2.ensmp.fr/tribo_paris/lectures/Computational_contact_mechanics_Yastrebov.pdf">Introduction to computational contact mechanics</a>. WEMESURF Short Course on Contact Mechanics and Tribology, Paris, France.</li>
+</ul>
+<!-- A.M.D.G. -->
+</div>
+</body>
+</html>
