@@ -1,0 +1,395 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>ME 498CM—Fluent 1</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="./css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+    <section id="heading" class="clearfix">
+      <table><tr><td>
+      <div id="logo-heading">
+        <img src="./img/fluent-logo1.png"/>
+      </div>
+      </td></tr><tr><td>
+      <h2 id="introduction-workflow">1. Introduction &amp; Workflow</h2>
+      </td></tr></table>
+    </section>
+
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-1">Exercise 1.1: Mixing Tee</a>
+<ul>
+<li><a href="#ex-1-problem">Problem Description</a></li>
+<li><a href="#ex-1-start">Getting Started</a></li>
+<li><a href="#ex-1-mesh">Mesh</a></li>
+<li><a href="#ex-1-model">Model</a></li>
+<li><a href="#ex-1-materials">Materials</a></li>
+<li><a href="#ex-1-phases">Phases</a></li>
+<li><a href="#ex-1-cells">Cell Zone Conditions</a></li>
+<li><a href="#ex-1-etc">Mesh Interfaces, Dynamic Mesh, Reference Values</a></li>
+<li><a href="#ex-1-soln-methods">Solution Methods</a></li>
+<li><a href="#ex-1-soln-controls">Solution Controls</a></li>
+<li><a href="#ex-1-monitors">Monitors</a></li>
+<li><a href="#ex-1-init">Initialization</a></li>
+<li><a href="#ex-1-calc-act">Calculation Activities</a></li>
+<li><a href="#ex-1-run-calc">Run Calculation</a></li>
+<li><a href="#ex-1-post">Postprocessing</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#conc">Conclusion</a></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+<hr />
+<table><tr><td>
+<p><a id='ex-1'></a></p>
+<h2 id="exercise-1.1-mixing-tee">Exercise 1.1: Mixing Tee</h2>
+<p>This laboratory exercise will introduce you to the commercial computational fluid dynamics (CFD) software <a href="http://www.ansys.com/Products/Simulation+Technology/Fluid+Dynamics/Fluid+Dynamics+Products/ANSYS+Fluent/">ANSYS® Fluent</a>. Fluent is comparable to many other CFD codes in that it uses the <a href="http://mathworld.wolfram.com/FiniteVolumeMethod.html">finite-volume method</a> to solve the governing mass and momentum equations. Fluent is not the only commercial code used in industry, though it is fairly popular. The real trick to learning any piece of software is to know 1) what its capabilities and limitations are; and 2) where in the interface the various features and options are located.</p>
+<p>This is the first of many exercises that will introduce you to the software. We begin by simulating a mixing tee. We will begin <em>in media res</em>: the geometry and mesh are already provided, and you will walk through the stages of setting up and executing the job, as well as plotting the results. We will then circle back around to creating a mixing tee geometry and mesh so that you can see all steps in the Fluent workflow.</p>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-1-problem'></a></p>
+<h2 id="problem-description">Problem Description</h2>
+<p>We will simulate the flow of water through a mixing tee at two different inlet temperatures. We wish to determine features of the resulting temperature distribution as well as the axial velocity profile along the centerline.</p>
+<div class="figure">
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-problem.png?token=0a0b8c5e83bc462409356b4b70ce1408742953c5" />
+</div>
+<p>Cold water at <span class="math">\(10 \,^{\circ} \text{C}\)</span> will flow into a <span class="math">\(5 \,\text{cm}\)</span> ⌀, <span class="math">\(30 \,\text{cm}\)</span> long section of pipe at a volumetric rate of <span class="math">\(40 \,\text{cm}^{3} \cdot \text{s}^{-1}\)</span>. Hot water at <span class="math">\(90 \,^{\circ} \text{C}\)</span> will enter the mixing tee halfway up (<span class="math">\(15 \,\text{cm}\)</span> along the pipe) via a <span class="math">\(3 \,\text{cm}\)</span> ⌀, <span class="math">\(15 \,\text{cm}\)</span> long section of pipe at a volumetric rate of <span class="math">\(20 \,\text{cm}^{3} \cdot \text{s}^{-1}\)</span>.</p>
+<p><span class="math">\[
+\begin{align}
+\rho_{\text{water}} &amp; = 1 \,\text{g} \cdot \text{cm}^{-3} \\
+\mu_{\text{water}}  &amp; = 0.01 \,\text{cP} = 0.01 \,\text{g} \cdot \text{cm}^{-1} \cdot \text{s}^{-1}
+\end{align}
+\]</span></p>
+</td></tr></table>
+
+<table><tr><td>
+<h5 id="exercise">Exercise</h5>
+<ul>
+<li>Determine the Reynolds number of this flow at the inlets and outlet and thus whether turbulence will need to be considered in the solution (laminarity requires <span class="math">\(\text{Re}_{\text{D}} \lesssim 2300\)</span>). (Assume incompressiblity and that fluid properties remain constant at their given room-temperature values for this calculation.)</li>
+</ul>
+<div class="input_area">
+<pre>
+# Calculate Reynolds number of cold inlet flow.
+from math import pi
+
+rho_water = 1.0  # g·cm^-3
+mu_water  = 0.01 # g·cm^-1·s^-1
+
+V_z = 40.0  # cm^3·s^-1
+D_z =  5.0  # cm
+A_z = pi * D_z ** 2 / 4 # cm^2
+
+v_z = V_z / A_z # cm·s^-1
+Re_z = rho_water * v_z * D_z / mu_water;
+print('v_z = ', v_z)
+print('Re_z = ', Re_z)
+</pre>
+</div>
+
+<div class="output_area">
+<pre>
+v_z =  2.0371832715762603
+Re_z =  1018.5916357881302
+</pre>
+</div>
+
+<div class="input_area">
+<pre>
+# Calculate Reynolds number of hot inlet flow.
+V_y = 20.0  # cm^3·s^-1
+D_y =  3.0  # cm
+A_y = pi * D_y ** 2 / 4 # cm^2
+
+v_y = V_y / A_y # cm·s^-1
+Re_y = rho_water * v_y * D_y / mu_water;
+print('v_y = ', v_y)
+print('Re_y = ', Re_y)
+</pre>
+</div>
+
+<div class="output_area">
+<pre>
+v_y =  2.8294212105225838
+Re_y =  848.8263631567751
+</pre>
+</div>
+
+<div class="input_area">
+<pre>
+# Calculate Reynolds number of outlet flow.
+V_out = V_y + V_z # cm^3·s^-1
+D_out = D_z  # cm
+A_out = A_z  # cm^2
+
+v_out = V_out / A_out # cm·s^-1
+Re_out = rho_water * v_out * D_out / mu_water;
+print('v_out = ', v_out)
+print('Re_out = ', Re_out)
+</pre>
+</div>
+
+<div class="output_area">
+<pre>
+v_out =  3.0557749073643903
+Re_out =  1527.8874536821952
+</pre>
+</div>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-start'></a></p>
+<h2 id="getting-started">Getting Started</h2>
+<ul>
+<li>
+<p>Please download the <a href="./data/1-mixing-tee.zip">ANSYS project <code>mixing_tee</code></a>.</p>
+<p>Start ANSYS Workbench. (Close the “Getting Started” box if it pops up.) Open the project <code>mixing_tee</code> from the Toolbar. (Ignore any warnings at this point.)</p>
+<p>A list of tasks is loaded in the Project Schematic side of the interface. Note that the <code>Geometry</code> and <code>Mesh</code> are marked by green checks, meaning they are ready. Double-click <code>Setup</code> to launch Fluent and start setting up the problem. Select <code>double precision</code> and click <code>OK</code>.</p></li>
+</ul>
+<div class="figure">
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-getting-started.png?token=7d98a02cb8ae1b8ce56f44ddf0d453f9494e65ed" />
+</div>
+<p>A wireframe of the mesh will load in the graphics window, and some details of the mesh will print to the console window. The left side of the interface contains a list of items that require definition each time you set up a model in Fluent. In fact, if you look at the main menu, you will see these exact tasks under the <code>Define</code> and <code>Solve</code> menus. The order of this menu suggests the order in which you should complete the required tasks.</p>
+<p>Notice when you click on the different entries in the left pane, how the next section over changes and reveals sub-options and more tasks for you to complete when defining the model.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-mesh'></a></p>
+<h2 id="mesh">Mesh</h2>
+<p>Here is where you can scale the coordinates of your mesh: for example, if you define your geometry in millimeters, you can easily scale it down by a factor of 1000 to get it to meters. (Fluent requires standard SI units for all dimensions and properties.)</p>
+<p>Here you also define steady or transient, whether or not you want a pressure-based solver (incompressible flow) or a density-based solver (compressible flow). You can also define your out-of-plane assumption when working with 2D models (planar vs axisymmetric).</p>
+<ul>
+<li>Click on <code>Units</code> and set the unit of temperature to <code>c</code> (Centigrade).</li>
+</ul>
+<div class="figure">
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-units.png?token=031425c9de04f69892139fe6640cd1a2e4c2c528" />
+</div>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-model'></a></p>
+<h2 id="model">Model</h2>
+<p>Here you specify the physics you want to include in your model.</p>
+<ul>
+<li><p>Double click on <code>Energy</code> and click the check box to enable the solution of the energy equation.</p></li>
+<li><p>Double click on <code>Viscous</code> and make sure that <code>laminar</code> is selected (no turbulence model, in accordance with your calculation of <span class="math">\(\text{Re}_{\text{D}}\)</span> above).</p></li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-materials'></a></p>
+<h2 id="materials">Materials</h2>
+<p>Here is where you define your material properties. The default fluid is always air. You could create new material by typing in its physical properties. Alternatively, Fluent has most commonly used materials in its database. You simply need to copy them from there.</p>
+<ul>
+<li>Click <code>Create/Edit…</code>, and then <code>Fluent Database</code>.
+<ul>
+<li>Find <code>water-liquid (h2o&lt;l&gt;)</code> from the list and click <code>Copy</code>.</li>
+<li>Close the windows and see <code>water-liquid</code> appear in the available fluid list.</li>
+</ul>
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-materials.png?token=abdb0b4fa8b1a6d60c9a18e4acea5856363bccf8" title="fig:" width="100%" /></li>
+</ul>
+</div>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-phases'></a></p>
+<h2 id="phases">Phases</h2>
+<p>Multiphase flow will remain disabled for now—we are working with a single phase simulation, and thus you don’t need to do anything here. We will revisit this later as needed.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<hr />
+<p><a id='ex-1-cells'></a></p>
+<h2 id="cell-zone-conditions">Cell zone conditions</h2>
+<p>Here is where you define cell zone properties. For instance, define the material in the zone, setup porous zones, etc.</p>
+<ul>
+<li><p>Double click the zone called <code>fluid</code>. Change <code>Material Name</code> to <code>water-liquid</code>.</p>
+<div class="figure">
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-phases.png?token=f01cde442b1f50bed68dff1ef7d8b14a47bdff34" width="100%" />
+</div></li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-bcs'></a></p>
+<h2 id="boundary-conditions">Boundary Conditions</h2>
+<p>Here you apply your boundary conditions to the list of surfaces you created:  <code>inlet-y</code>, <code>inlet-z</code>, etc.  Note that you can specify boundary conditions for each equation in the simulation:  momentum, energy, and so forth.</p>
+<ul>
+<li>Select <code>inlet-y</code>, and click <code>Edit…</code>.
+<ul>
+<li>On the <code>Momentum</code> tab, enter a velocity magnitude of your inlet velocity (not volumetric flow rate!) in m/s: <code>0.02037</code>.</li>
+<li>On the <code>Thermal</code> tab, enter <code>10</code> for temperature.</li>
+</ul>
+<div class="figure">
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-bcs.png?token=2324ca63b7edd7a9b26556d39e062631a6161246" />
+</div></li>
+<li>Set the boundary conditions for <code>inlet-z</code> accordingly and accept default settings for other boundaries:
+<ul>
+<li><code>0.02829</code> for velocity;</li>
+<li><code>90</code> for temperature.</li>
+</ul></li>
+<li><p>Click <code>Edit</code> and examine the settings for <code>outlet-y</code> and <code>wall-solid</code> without making any changes.</p></li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-etc'></a></p>
+<h2 id="mesh-interfaces-dynamic-mesh-reference-values">Mesh Interfaces, Dynamic Mesh, Reference Values</h2>
+<p>We will revisit these as needed.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-soln-methods'></a></p>
+<h2 id="solution-methods">Solution Methods</h2>
+<p>Here you can select appropriate numerical methods to solve your problem.</p>
+<p>Choose <code>First Order Upwind</code> for Momentum and Energy.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-soln-controls'></a></p>
+<h2 id="solution-controls">Solution Controls</h2>
+<p>Here you control the iterative solution process, as you may have learned in <a href="https://courses.illinois.edu/schedule/terms/ME/412">ME 412</a> or another CFD class.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-monitors'></a></p>
+<h2 id="monitors">Monitors</h2>
+<p>Here you define your convergence criteria and can set up a monitor to watch the value of certain quantities, like the integrated composition over the domain, or the flux through a surface.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-init'></a></p>
+<h2 id="initialization">Initialization</h2>
+<p>Here is where you define your initial conditions and initial guess of the solution for your iterative solution method.</p>
+<ul>
+<li>Click <code>Initialize</code> to seed the mesh with an initial guess for the iterative solution process.</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-calc-act'></a></p>
+<h2 id="calculation-activities">Calculation Activities</h2>
+<p>Here is where you can set up autosaves, animations, and any other tasks that need to happen as the model is being solved.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-run-calc'></a></p>
+<h2 id="run-calculation">Run Calculation</h2>
+<ul>
+<li>Enter <code>200</code> in <code>Number of Iterations</code></li>
+<li>Click <code>Calculate</code>.
+<ul>
+<li>Fluent will display the monitored variables in a plot format by iteration. This tells you about the convergence behavior (and whether your simulation is converging at all!).</li>
+</ul></li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-post'></a></p>
+<h2 id="postprocessing">Postprocessing</h2>
+<p>These are several tools that you use to query your results, be they intermediate or final. This is where you can make contour plots, or extract data and make <span class="math">\(x\)</span>–<span class="math">\(y\)</span> plots.</p>
+<ul>
+<li>For example, let’s make a temperature contour plot on the pipe wall.
+<ul>
+<li>Select <code>Graphics and Animation</code> at left.</li>
+<li>Double-click <code>Contours</code>.</li>
+<li>Check the <code>Filled</code> box.</li>
+<li>Choose a contour of <code>Temperature</code>, <code>Static Temperature</code> on the surface of <code>wall-solid</code>.</li>
+<li>Then click <code>Display</code>. The contour will appear in the graphics window. You can use the Toolbar to rotate, zoom, and move the contour.</li>
+</ul>
+<div class="figure">
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-results-contour.png?token=1db03d4f01ef4bb0f741d262f67e4cb286bbc7dc" />
+</div>
+<ul>
+<li>You can also try <code>Vectors</code>, which produces a three-dimensional plot of <code>Velocity</code>, <code>Velocity Magnitude</code> with the default settings.</li>
+</ul></li>
+<li>Now let's additionally make some two-dimensional plots:
+<ul>
+<li>Select <code>Plots</code> at left.</li>
+<li>Double-click <code>XY Plot</code>.</li>
+<li>If we select an existing surface and plot a feature, we get an aggregate plot of values along that surface. This is a little bit messy. <img src="" /></li>
+<li>What we would like isn't an aggregate plot like this, but a centerline (℄) plot. In order to do this, we need to create a line which describes the path along which we would like data.
+<ul>
+<li>In the <code>Solution XY Plot</code> dialog box, click <code>New Surface</code> and select <code>Line/Rake Surface</code>.</li>
+<li>Create a line from <code>(0, -15, 0)</code> to <code>(0, 15, 0)</code> and name it <code>centerline</code>. Click <code>Create</code> and then <code>Close</code>.</li>
+<li>Set the plot direction to <code>(0, 1, 0)</code>.</li>
+<li>Select <code>Temperature</code>, <code>Static Temperature</code> and <code>centerline</code>, then click <code>Plot</code>. <img src="" /></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>We performed the foregoing postprocessing in the <code>Solution</code> tool, rather than the standalone <code>Results</code> tool in the ANSYS Workbench. The <code>Results</code> tool is well-adapted for creating reports, and we will discuss it in a later class.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='conc'></a></p>
+<h2 id="conclusion">Conclusion</h2>
+<p>You have seen the typical workflow for a finite-volume or finite-element package, whether CFD or structural. ANSYS, ABAQUS, Fluent, COMSOL, and other packages all follow a similar workflow, stepping from definitions and meshing through solutions and postprocessing.</p>
+<div class="figure">
+<img src="./img/workflow.png" />
+
+<p>The next few exercises and workshops will step through this process. We will then examine transient simulations, turbulence models, and other significant modeling capacities.</p>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Zhongzhong Zhang, and Sparsh Chadha developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+
+</div>
+</body>
+</html>

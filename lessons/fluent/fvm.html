@@ -1,0 +1,126 @@
+<!doctype html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>ME 498CM—Fluent 1</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="./css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<h2 id="Computational-Fluid-Dynamics">Computational Fluid Dynamics<a class="anchor-link" href="#Computational-Fluid-Dynamics">&#182;</a></h2><p>ANSYS Fluent CFD, like most CFD programs, is based on the <em>finite volume method</em>.  The finite volume method is a generalization of the finite difference method to unstructured meshes.  Unlike the finite element method, FVM yields values across the entire volume contained within a cell:  this has a particular advantage in preserving the flux of state variables across intercellular surfaces.</p>
+<p>We are interested, in CFD, in solving the Navier–Stokes equations or some coherent simplified subset of these.  These are the set of equations which, taken together, completely describe continuum hydrodynamics.  The momentum conservation equations (in cartesian form) are:</p>
+$$
+\begin{align}
+  \rho \left(\frac{\partial u_x}{\partial t} + u_x \frac{\partial u_x}{\partial x} + u_y \frac{\partial u_x}{\partial y} + u_z \frac{\partial u_x}{\partial z}\right)
+    =& -\frac{\partial p}{\partial x} + \mu \left(\frac{\partial^2 u_x}{\partial x^2} + \frac{\partial^2 u_x}{\partial y^2} + \frac{\partial^2 u_x}{\partial z^2}\right) \\
+    & - \mu \frac{\partial}{\partial x} \left( \frac{\partial u_x}{\partial x} + \frac{\partial u_y}{\partial y} + \frac{\partial u_z}{\partial z} \right) + \rho g_x \\
+  \rho \left(\frac{\partial u_y}{\partial t} + u_x \frac{\partial u_y}{\partial x} + u_y \frac{\partial u_y}{\partial y}+ u_z \frac{\partial u_y}{\partial z}\right)
+    =& -\frac{\partial p}{\partial y} + \mu \left(\frac{\partial^2 u_y}{\partial x^2} + \frac{\partial^2 u_y}{\partial y^2} + \frac{\partial^2 u_y}{\partial z^2}\right) \\
+    & - \mu \frac{\partial}{\partial y} \left( \frac{\partial u_x}{\partial x} + \frac{\partial u_y}{\partial y} + \frac{\partial u_z}{\partial z} \right) + \rho g_y \\
+  \rho \left(\frac{\partial u_z}{\partial t} + u_x \frac{\partial u_z}{\partial x} + u_y \frac{\partial u_z}{\partial y}+ u_z \frac{\partial u_z}{\partial z}\right)
+    =& -\frac{\partial p}{\partial z} + \mu \left(\frac{\partial^2 u_z}{\partial x^2} + \frac{\partial^2 u_z}{\partial y^2} + \frac{\partial^2 u_z}{\partial z^2}\right) \\
+    & - \mu \frac{\partial}{\partial z} \left( \frac{\partial u_x}{\partial x} + \frac{\partial u_y}{\partial y} + \frac{\partial u_z}{\partial z} \right) + \rho g_z.
+\end{align}
+$$<p>The associated mass continuity equation is
+$$
+{\partial \rho \over \partial t} + {\partial (\rho u_x ) \over \partial x} + {\partial (\rho u_y) \over \partial y} + {\partial (\rho u_z) \over \partial z} = 0.
+$$</p>
+<p>(The right-hand side may be non-zero if multiple phases are involved, as this is where phase transitions are expressed mathematically.)</p>
+<p>There are a number of matters of taste involved in this derivation, like what the interpretation of the stress tensor sign means (inwards or outwards), but generally this is the equation one needs to simplify and solve<sup>[[Wikipedia](https://en.wikipedia.org/wiki/Derivation_of_the_Navier%E2%80%93Stokes_equations)]</sup>.</p>
+<p>How do we do this numerically?</p>
+<p>The quick heuristic (the lie that tells most of the truth) is that:</p>
+<ul>
+<li>the finite difference method discretizes the classical form of the PDE;</li>
+<li>the finite element method discretizes the weak form of the PDE; and</li>
+<li>the finite volume method discretizes the conservation form of the PDE.</li>
+</ul>
+<h3 id="Finite-Difference-Method">Finite Difference Method<a class="anchor-link" href="#Finite-Difference-Method">&#182;</a></h3><p>Recall first the finite difference method.  In FDM, you represent the differential equation directly using Taylor expansions around the derivatives as approximations.</p>
+<p>Consider a diffusion term in a differential equation.  (Other terms, including those in $u$ and $x,y,z$, are simply lumped into the "source term" $s$ for simplicity.)</p>
+$$
+\nabla^{2} u = s \rightarrow \frac{\partial ^{2} u}{\partial x^{2}} = s \text{.}
+$$<p>A Taylor series expansion around a given point yields the statement</p>
+$$
+\frac{\partial ^{2} u}{\partial x^{2}} \approx \frac{u_{j-1} - 2 u_{j} + u_{j+1}}{\Delta x^{2}}
+$$<p>with an associated error term $O(\Delta x^{2})$.  The corresponding "stencil" can be written</p>
+$$
+u_x = f(u_{x-1}, u_{x+1}) \text{.}
+$$<p>(This decomposition is not unique, and many stencils and error orders can be created.  Look into TAM 470 or CS 450 if you are interested in knowing more about these numerical methods.)</p>
+<h3 id="Finite-Volume-Method">Finite Volume Method<a class="anchor-link" href="#Finite-Volume-Method">&#182;</a></h3><p>The FVM starts from an exact <em>integral</em> form of the equation and applies the Gaussian divergence theorem<sup>[[Wikipedia](https://en.wikipedia.org/wiki/Divergence_theorem)]</sup> to generate a surface integral from the conservation volume integral<sup>[[LongND](http://www.math.uci.edu/~chenlong/226/FVM.pdf)]</sup>.  FVM may be thought of as a higher-dimensional analogue of FEM.</p>
+<p>Just as with FDM, we start with a boundary-value problem such as</p>
+$$
+\nabla^{2} u = s \rightarrow \frac{\partial ^{2} u}{\partial x^{2}} = s \text{.}
+$$<p>However, with FVM we generally convert this statement to an integral conservative form before discretization.  We have a lot of latitude in how the discretization is carried out; in particular, we can choose whether the calculated state values are associated with the centers of the cells or the vertices<sup>[[Venkatakrishnan1995](https://web.archive.org/web/20050516142824/http://techreports.larc.nasa.gov/icase/1995/icase-1995-3.pdf)]</sup>.</p>
+$$
+\int_{\Omega} \frac{\partial ^{2} u}{\partial x^{2}} = \int_{\Omega} s
+$$<p>in which the last term also include surface flux effects such as $\mathbf{u} \cdot \mathbf{n}$.</p>
+<p>Manipulations of the equations rely on the Gaussian divergence theorem; generally,</p>
+$$
+\iiint \limits_V \text{d} V \, \mathbf{\nabla} \cdot \mathbf{F} =
+\oiint_{S(V)} \text{d} S \, \mathbf{F} \cdot \hat{\mathbf{N}} \text{.}
+$$<p>The finite volume method can proceed along several lines of generalization at this point based on the quadrature rule for discrete integration and the closure of the integration point fluxes in each discrete volume.  These are typically chosen to enforce the constraint that the approximation of the fluxes (both advective and diffusive) leaving one cell are the same as those entering its neighbor (via that interface).  FVM does very well with direct quantities such as mass and momentum preservation (but not necessarily second-order properties such as vorticity or kinetic energy).</p>
+<p><img src="./img/fvm.png" alt=""></p>
+<p>Cell-centered schemes require between 2–6× the number of data points that vertex schemes do.  On the other hand, they provide a comparable increase in accuracy for the same mesh size<sup>[[CFD forum thread](http://www.cfd-online.com/Forums/main/1886-fvm-vertex-centered-cell-centered-cell-vertex.html)]</sup>.  (This seems to be something of an open question, being solved by increased total computational power rather than a really tight theoretical argument<sup>[[Venkatakrishnan1995](https://web.archive.org/web/20050516142824/http://techreports.larc.nasa.gov/icase/1995/icase-1995-3.pdf)]</sup>.)</p>
+<p>In some sense, FVM is more natural to implement on a unstructured mesh, and offers better stability.  You can think of think of FVM as a simplified or zeroth-order FEM formulation via the divergence theorem, with element properties averaged to the cell center or vertices rather than calculated at nodes.  The accuracy is somewhat lower, but in many cases you are looking for qualitative behavior instead of quantitative precision.</p>
+<p>If you are interested in knowing more about this topic, ME 412 deals with FVM and the various CFD solution algorithms.</p>
+<h3 id="Finite-Element-Method-(Comparison)">Finite Element Method (Comparison)<a class="anchor-link" href="#Finite-Element-Method-(Comparison)">&#182;</a></h3><p>Contrast this with the finite element method, with its shape functions and nodal values.  FEM is built around discretizing the weak form of the PDE and provides values at nodes and across the element.</p>
+<p>Arguably, the physical model encompassed by a typical CFD simulation is more complex than that of a typical structural mechanics simulation (at least at the level accessible in this class).  Structural mechanics simulations are typically carried out with an eye to displacement and stress/strain values, while CFD simulations must necessarily (at a minimum!) involve entities such as boundary layers, strong pressure gradients, discontinuities, kinetic energy, and the flux of several quantities between cells.</p>
+<p>So why not use FEM for everything?  Actually, FEM dominates over FVM in almost every field <em>except</em> CFD.  The major reasons for FVM's persistent popularity in CFD are its faster solution time and the unsuitability of higher-order finite elements to the description of fluid flow (particularly cases with sharp gradients like turbulence or shock fronts).  (But that is a controversial statement.)  FEM tends to be preferred for multiphysics cases, though, particularly with a solid–liquid interface, as the mesh discretizations need to be compatible for better results.</p>
+<blockquote>
+In simplistic terms, the way I like to look at it is that a FVM method is zeroth order with a node in the centroid of a finite volume. If the finite volume and finite element are descretized with the exact same geometry, then the finite volume can be thought of as a finite element. A linear-basis finite element uses a linear interpolation between the node points on the finite element which are located at each corner instead of the FVM centroid. Thus you have eight nodes instead of one node in the equivalent finite element (volume).Thus the accuracy is that much more greater for the FEM method.  —James Freels<sup>[[COMSOL2010](http://www.comsol.com/community/forums/general/thread/5027/)]</sup>
+</blockquote><p>There is also, finally, a strong caveat to the finite volume method:  it will almost always yield a converged solution, but it is incumbent upon you to verify whether this solution is physically meaningful or accurate.  FVM also introduces more numerical diffusion than FEM typically (which may require a finer mesh).</p>
+<h2 id="Fluent-Implementation-&amp;-Physical-Theory">Fluent Implementation &amp; Physical Theory<a class="anchor-link" href="#Fluent-Implementation-&amp;-Physical-Theory">&#182;</a></h2><blockquote>
+For all flows, ANSYS Fluent solves conservation equations for mass and momentum [(some simplification of the Navier–Stokes equations)].  For flows involving heat transfer or compressibility, an additional equation for energy conservation is solved. For flows involving species mixing or reactions, a species conservation equation is solved or, if the non-premixed combustion model is used, conservation equations for the mixture fraction and its variance are solved.
+</blockquote><p>Naturally, Fluent also supports compressible flow, turbulence, multiphase flow, magnetohydrodynamics, combustible flow, and other models.  You can even designate whether a simulation is Eulerian or Lagrangian.  An Eulerian model involves a mesh which the fluid flows through (like a pipe or mesh of control volumes).  A Lagrangian model, by contrast, describes the fluid itself flowing and deforming, with no material transfer between cells<sup>[[Wikiversity](https://en.wikiversity.org/wiki/Nonlinear_finite_elements/Lagrangian_and_Eulerian_descriptions)]</sup>.</p>
+<p>Turbulence manifests as a cascade of self-similar flows across many scales.  Thus to resolve turbulence requires an extremely fine grid, down to the millimeter level in some cases.  This is impractical (a $100 \times 100 \times 1000$ grid already contains $10^{7}$ cells with their associated data!).  Thus the effect of turbulence is often "bundled" into a kinetic or dissipative energy term with its own governing equation.</p>
+<p>Fluent tends to be better at large turbulent flows, while COMSOL excels at pores and low-Reynolds-number flows (Stokes flow—think of lava) and has the reputation of a steep learning curve to perform CFD correctly.  OpenFOAM and SU2 are both powerful open-source packages, but they are very demanding of the user since they essentially require you to program your governing equations directly.</p>
+<h2 id="Fluent-Workflow">Fluent Workflow<a class="anchor-link" href="#Fluent-Workflow">&#182;</a></h2><p>See the associated <a href="./intro.html">step-by-step guide</a> to get started using Fluent.</p>
+<h2 id="References">References<a class="anchor-link" href="#References">&#182;</a></h2><ul>
+<li><p>Alakashi, A. M., Basuno, B., Elkamel, H. T. M.  (2015)  <a href="http://article.sciencepublishinggroup.com/pdf/10.11648.j.acm.s.2015040101.13.pdf">Comparison between finite volume method (FVM) based on inviscid and viscous flow with experimental and Fluent results</a>.  *Applied and Computational Mechanics 4):  1-1.  pp. 12–17.</p>
+</li>
+<li><p><a href="./refs/ANSYS Fluent Getting Started Guide.pdf">Fluent Getting Started Guide</a></p>
+</li>
+<li><p><a href="./refs/ANSYS Fluent Theory Guide.pdf">Fluent Theory Guide</a></p>
+</li>
+<li><p><a href="./refs/ANSYS Fluent Users Guide.pdf">Fluent User's Guide</a></p>
+</li>
+<li><p>Long, Chen.  <a href="http://www.math.uci.edu/~chenlong/226/FVM.pdf">Finite Volume Methods</a>.</p>
+</li>
+<li><p>Vanselow, R.  (1996)  <a href="http://download.springer.com/static/pdf/752/art%253A10.1007%252FBF02276874.pdf?originUrl=http%3A%2F%2Flink.springer.com%2Farticle%2F10.1007%2FBF02276874&token2=exp=1442957577~acl=%2Fstatic%2Fpdf%2F752%2Fart%25253A10.1007%25252FBF02276874.pdf%3ForiginUrl%3Dhttp%253A%252F%252Flink.springer.com%252Farticle%252F10.1007%252FBF02276874*~hmac=b448e69fb7a8ea2d4405c5ff2e8b17433c7d189dfdd5705e8b965bd850db60d3">Relations between FEM and FVM applied to the Poisson equation</a>.  <em>Computing 57</em>, pp. 93–104.</p>
+</li>
+<li><p>Venkatakrishnan, V.  (1995)  <a href="https://web.archive.org/web/20050516142824/http://techreports.larc.nasa.gov/icase/1995/icase-1995-3.pdf">A Perspective on Unstructured Grid Flow Solvers</a></p>
+</li>
+</ul>
+<!-- A.M.D.G. -->
+</div>
+</body>
+</html>
