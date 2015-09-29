@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>2. Postprocessing</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<h1 id="ansys-fluent-cfd-a-short-course-for-engineers">ANSYS® Fluent CFD: A Short Course for Engineers</h1>
+<h2 id="workflow">2. Workflow</h2>
+<h5 id="april-6-2015-computational-science-and-engineering">April 6, 2015 • Computational Science and Engineering</h5>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-1">Exercise 2.2: 3D Laminar Pipe Flow</a>
+<ul>
+<li><a href="#ex-1-geom">Geometry</a></li>
+<li><a href="#ex-1-mesh">Meshing</a></li>
+<li><a href="#ex-1-pre">Preprocessing</a></li>
+<li><a href="#ex-1-proc">Processing</a></li>
+<li><a href="#ex-1-post">Postprocessing</a></li>
+</ul></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1'></a></p>
+<h2 id="exercise-2.2-3d-laminar-pipe-flow">Exercise 2.2: 3D Laminar Pipe Flow</h2>
+<p><img src="./img/lab2/workbench-new.png" width="15%" align="right" /></p>
+<p>We will now repeat the solution in 3D, using a cylinder.  This should be equivalent to the 2D axisymmetric case if the mesh is adequate.</p>
+<ol>
+<li>Create a new project in the <em>Workbench</em>. Name this project <code>3D Case</code>.</li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-geom'></a></p>
+<h3 id="geometry">Geometry</h3>
+<ol>
+<li><p>Each object displays an icon <img src="./img/icon-waiting.png" /> indicating that it is pending input. Double click <code>Fluid Flow (FLUENT)</code> to load a fluid flow project.</p></li>
+<li><p>Double click <code>Geometry</code> to launch the <em>DesignModeler module</em> and start generating a domain.</p>
+<ol>
+<li>Select an appropriate length unit via the menu <code>Units→Meter</code>.</li>
+</ol></li>
+<li><p>In the <em>Tree Outline</em>, right-click on the <code>XYPlane</code> object and select <code>Look At</code> <img src="./img/icon-look-at.png" />. Select the <code>Sketching</code> tab at the bottom of the <em>Tree Outline</em>.</p></li>
+<li><p><img src="./img/lab2/dm-constraints.png" width="25%" align="right" /> Click the <code>Constraints</code> tab and select the <code>Auto Constraints→Cursor</code> option. This will snap your drawings to the axis instead of leaving them just off of it.</p></li>
+<li><p>Open the <em>Draw</em> tab and select the <code>Rectangle</code> tool <img src="./img/icon-dm-rect.png" />. Draw a rectangle on the <em>XYPlane</em> by clicking two points in the sketch area. (You can zoom in using the <code>Zoom</code> tool <img src="./img/icon-zoom.png" />, clicking the viewport, and dragging upwards; alternatively, use the <code>Best Fit</code> tool <img src="./img/icon-zoom-best.png" />.)</p></li>
+<li>Open the <em>Dimensions</em> tab and select <code>Length/Distance</code> <img src="./img/icon-dim-length.png" />.
+<ol>
+<li>Click the top and bottom edges of the rectangle. A dimension line should appear; click a third time within the rectangle and the <em>Details View</em> adds a <em>Dimensions</em> option. Set <code>L1</code> to the pipe <em>radius</em> <code>0.05</code> m (consistent with your choice of a length scale in the <code>Units</code> menu.)</li>
+<li>Repeat this process on the left and right edges to set <code>L2</code> to the appropriate length, <code>1.0</code> m.</li>
+<li>Click the <code>Generate</code> button <img src="./img/icon-generate.png" />.</li>
+</ol></li>
+<li>We will now convert this two-dimensional rectangle into a cylinder representing the available volume of fluid flow. Switch to the <em>Modeling</em> tab and expand <em>XYPlane</em>. The sketch we just created is listed here.
+<ol>
+<li><img src="./img/lab2/dm-base-object.png" align="right" /> Select <code>Sketch1</code>. From the <em>Main Menu</em>, select <code>Concept→Surfaces from Sketches</code> <img src="./img/icon-surf-from-sketch.png" />. In the <em>Details View</em>, confirm the choice of base object. A new entry <code>SurfaceSk1</code> appears.</li>
+<li>Select <code>SurfaceSk1</code> and click the <code>Revolve</code> button <img src="./img/icon-revolve.png" />.</li>
+<li>In the <em>Details View</em>, click <code>Geometry→Apply</code> to confirm that the sketch is the correct geometry.</li>
+<li>Click the yellow <code>Axis</code> bar and then select the <span class="math">\(x\)</span>-axis. <img src="./img/lab2/dm-details-revolve.png" width="25%" align="right" /></li>
+<li>Click the <code>Generate</code> button <img src="./img/icon-generate.png" /> and <code>Revolve1</code> becomes a solid three-dimensional body.</li>
+</ol>
+<p><img src="./img/lab2/dm-final.png" /></p>
+<p><img src="./img/lab2/workbench-mesh.png" width="15%" align="right" /></p></li>
+<li><p>Save the project and close <em>DesignModeler</em>. The <code>Geometry</code> is now complete <img src="./img/icon-complete.png" /> allowing the <code>Meshing</code> module to be updated <img src="./img/icon-refresh.png" />.</p></li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-mesh'></a></p>
+<h3 id="meshing">Meshing</h3>
+<p>Double-click to open the <em>Meshing</em> interface. After a few moments, the geometry generated in <em>DesignModeler</em> appears in isometric display.</p>
+<ol>
+<li>There are a number of ways of generating a mesh, depending on the geometry, physical problem, desired accuracy, etc. For this specific example—laminar flow in a cylindrical domain—a uniform Cartesian grid is appropriate. This is done by using the <code>Mapped Face Meshing</code> tool <img src="./img/icon-mesh-mapped-face.png" />.
+<ol>
+<li>Right-click the <code>Mesh</code> object and select <code>Insert→Mapped Face Meshing</code> <img src="./img/icon-mesh-mapped-face.png" />. Click <code>Geometry→Apply</code> to confirm that the body is the correct geometry to mesh.</li>
+<li><img src="./img/lab2/mesh-sizing.png" width="200px" align="right" /> With the <code>Mesh</code> object selected, in the <em>Details View</em>, expand the <code>Sizing</code> specification. Set <code>Max Face Size</code> to <code>0.1</code>, thereby limiting the elements to <span class="math">\(0.1 \,\text{m} \times 0.1 \,\text{m}\times 0.1 \,\text{m}\)</span> maximum extension.</li>
+<li><p>Click <code>Update</code> <img src="./img/icon-update.png" />. The resulting mesh is blocky and likely inadequate. </p><img src="./img/lab2/mesh-blocky.png" width="400px" />
+<img src="http://weknowmemes.com/wp-content/uploads/2012/08/genius-meme.jpg" width="200px" />
+<p><img src="./img/lab2/mesh-details-type.png" width="200px" align="right" /> An alternative method is to assign local sizing to edges or faces. Select the target face (holding Control to multiply select) using the <code>Select Face</code> tool <img src="./img/icon-select-face.png" />. Right click and select <code>Insert→Sizing</code> <img src="./img/icon-mesh-sizing.png" />. If using a face, in the <em>Details View</em> window <code>Sizing</code> entry, set <code>Type</code> to <code>Element Size</code>, and set <code>Element Size</code> to <code>0.01</code>. If using an edge, in the <em>Details View</em> window <code>Sizing</code> entry, set <code>Type</code> to <code>Number of Divisions</code>, and set <code>Number of Divisions</code> to <code>100</code>. Thus you specify 100 divisions along that edge. (You can specify <code>Hard</code> or <code>Soft</code> adherence to this standard as well.) <img src="./img/lab2/mesh-smooth.png" width="400px" /></p>
+</li>
+</ol></li>
+<li>We now need to define the inlet and outlet surfaces of the mesh.
+<ol>
+<li>Select the closest circular face of the geometry (assuming the default orientation).</li>
+<li>Right-click and select <code>Create named selection</code> <img src="./img/icon-mesh-named-selection.png" />. The <em>Create Named Selection</em> dialog appears.</li>
+<li>Name this face <code>outlet</code>.</li>
+<li>Repeat this process for the other end, naming it <code>inlet</code>.</li>
+</ol></li>
+<li>Save the project and return to the <em>Workbench</em>. The <code>Meshing</code> is now complete <img src="./img/icon-complete.png" /> allowing the <code>Setup</code> module to be updated <img src="./img/icon-refresh.png" />.</li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-pre'></a></p>
+<h3 id="preprocessing">Preprocessing</h3>
+<p>Most of the heavy lifting that we need to do is now completed. Open <em>Setup</em> to go into Fluent proper.</p>
+<ol>
+<li><p>Check the <code>double precision</code> option; <code>3D</code> is selected for you. After a few moments, the mesh is loaded and displayed.</p></li>
+<li><p>We will carry out a <code>Pressure-based</code> simulation.</p></li>
+<li><p>The flow is isothermal and laminar, so neither a turbulence model nor an energy equation is necessary; leave the <em>Models</em> menu at its defaults.</p></li>
+<li><p>In <em>Materials</em>, change the base properties of <code>air</code> as specified earlier: <span class="math">\(\rho = 1 \,\text{kg}\cdot\text{m}^{3}\)</span> and <span class="math">\(\nu = 1 \times 10^{-3} \,\text{kg}\cdot\text{m}^{-1}\cdot\text{s}^{-1}\)</span>.</p></li>
+<li><p>Skip <em>Cell Zone Conditions</em> as we do not add any new materials.</p></li>
+<li>In <em>Boundary Conditions</em>, you will see four boundaries labeled as <code>interior-solid</code>, <code>wall-centerline</code>, <code>outlet</code>, and <code>inlet</code>.
+<ol>
+<li>You can choose the type of a boundary by the <code>Type</code> pull down list. For example, select <code>velocity-inlet</code> for the <code>input</code> boundary. In the <code>Edit...</code> dialog, enter <code>1</code> m/s as the velocity magnitude.</li>
+<li>Select <code>pressure-outlet</code> for the right boundary. Keep the gauge pressure as 0 pascal.</li>
+</ol></li>
+<li><p>Go to <em>Reference Values</em> and select <code>Compute from</code> <code>inlet</code>.</p></li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-proc'></a></p>
+<h3 id="processing">Processing</h3>
+<ol>
+<li><p>Go to <em>Solution Initialization</em>. Choose <code>Standard Initialization</code>, select <code>Compute from</code> <code>inlet</code>, and click <code>Initialize</code>.</p></li>
+<li><p>After initialization, go to <em>Run Calculation</em> and carry out <code>150</code> iterations. The simulation should converge very quickly (at 62 iterations for my settings).</p></li>
+</ol>
+<div class="figure">
+<img src="./img/lab2/job-results.png" />
+</div>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1-post'></a></p>
+<h3 id="postprocessing">Postprocessing</h3>
+<h4 id="contour">Contour</h4>
+<ol>
+<li>To visualize contours of velocity, open <code>Graphics and Animations→Contours</code>.
+<ol>
+<li>Change the <code>Contours of</code> pull-down lists to <code>Velocity</code> and <code>X Velocity</code>.</li>
+<li>Select the <code>interior-solid</code> surface.</li>
+<li>Check the <code>Filled</code> box.</li>
+<li>Click <code>Display</code>.</li>
+</ol></li>
+</ol>
+<div class="figure">
+<img src="./img/lab2/post-contours-v-3d.png" />
+</div>
+<p>It is also enlightening to see the small effects of meshing and numerics on a solution. For instance, one can observe some asymmetry in the results by similarly plotting <code>Axial Velocity</code> (but look at the scale—on the previous scale, this variation wouldn't even be visible).</p>
+<h4 id="streamlines">Streamlines</h4>
+<ol>
+<li>In the <em>Graphics list</em>, double-click on the <code>Pathlines</code> option.
+<ol>
+<li>Change the first box under <code>Color by</code> to <code>Velocity</code> and the second box to <code>Velocity Magnitude</code>.</li>
+<li>Highlight <code>interior-solid</code> under the <em>Release from Surfaces list</em>.</li>
+<li>Click <code>Display</code>.</li>
+</ol></li>
+</ol>
+<div class="figure">
+<img src="./img/lab2/post-plot-streamlines-3d.png" />
+</div>
+<h4 id="verification">Verification</h4>
+<p>Now we will compare to the previous (2D) simulation results, if you still have your spreadsheet handy.</p>
+<ol>
+<li>Plot the velocity at the outlet as a function of the distance from the centerline.
+<ol>
+<li>Under <code>Plot Direction</code>, change <code>X</code> to <code>0</code> and <code>Y</code> to <code>1</code> (this makes the position variable move along the radius from the centerline).</li>
+<li>Create a straight line raking the outlet diameter. Click <code>New Surface→Line/Rake</code>.
+<ol>
+<li>Enter <code>x0=1</code>, <code>y0=-0.05</code>, <code>z0=0</code>, <code>x1=1</code>, <code>y1=0.05</code>, <code>z1=0</code>.</li>
+<li>Enter <code>line1</code> under <code>New Surface Name</code>.</li>
+<li>Click <code>Create</code> and then <code>Close</code>.</li>
+</ol></li>
+<li>Deselect any other items and select <code>line1</code>.</li>
+<li>Then click <code>Plot</code>. <img src="./img/lab2/post-plot-outlet-3d.png" /></li>
+</ol></li>
+<li>Export the data to a text file in order to compare it with the exact solution.
+<ol>
+<li>Check the <code>Write to File</code> box in the upper left corner.</li>
+<li>Click on <code>Write</code> and name the output file <code>pipe-3d.txt</code>.</li>
+<li>Copy the output data into Excel with your previous data form <code>pipe-2d.txt</code> and make a plot of <span class="math">\(u_{}/u_{\text{max}}\)</span> versus <span class="math">\(y\)</span> (or <span class="math">\(r\)</span>) including the analytical solution.</li>
+</ol></li>
+</ol>
+<p>The congruence of all of these results leads us to place a high degree of confidence in this simulation.</p>
+</td></tr></table>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Sparsh Chadha, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</div>
+</div>
+    </div>
+  </div>
+</body>
+</html>

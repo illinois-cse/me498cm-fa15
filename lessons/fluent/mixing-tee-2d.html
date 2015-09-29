@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>3. Composite Geometry</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+    <section id="heading" class="clearfix">
+      <table><tr><td>
+      <div id="logo-heading">
+        <img src="../img/fluent-logo1.png"/>
+      </div>
+      </td></tr><tr><td>
+      <h2 id="composite-geometry">3. Composite Geometry</h2>
+      <h5 id="april-9-2015-computational-science-and-engineering">April 9, 2015 • Computational Science and Engineering</h5>
+      </td></tr></table>
+    </section>
+
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-2">Exercise 3.2: Mixing Tee Redux (In 2D)</a>
+<ul>
+<li><a href="#ex-2-pre">Preprocessing</a></li>
+<li><a href="#ex-2-geom">Geometry</a></li>
+<li><a href="#ex-2-mesh">Mesh</a></li>
+<li><a href="#ex-2-setup">Setup</a></li>
+<li><a href="#ex-2-redux">Redux<a/>
+<ul>
+<li><a href="#ex-2-redux-models">Models</a></li>
+<li><a href="#ex-2-redux-mesh">Solution Methods</a></li>
+</ul></li>
+</ul></li>
+<li><a href="#conc">Conclusion</a></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+
+<table><tr><td>
+<hr />
+<p><a id='ex-2'></a></p>
+<h2 id="exercise-3.2-mixing-tee-redux">Exercise 3.2: Mixing Tee Redux (In 2D)</h2>
+<p>We will simulate the flow of water through a mixing tee at two different inlet temperatures. We wish to determine features of the resulting temperature distribution as well as the axial velocity profile along the centerline.</p>
+<div class="figure">
+<img src="https://bytebucket.org/davis68/fluent/raw/7370a3618290713048cb2b51ac72ae901ee25caf/lessons/img/lab1-problem.png?token=0a0b8c5e83bc462409356b4b70ce1408742953c5" />
+</div>
+<p>Cold water at <span class="math">\(10 \,^{\circ} \text{C}\)</span> will flow into a <span class="math">\(5 \,\text{cm}\)</span> ⌀, <span class="math">\(30 \,\text{cm}\)</span> long section of pipe at a volumetric rate of <span class="math">\(40 \,\text{cm}^{3} \cdot \text{s}^{-1}\)</span>. Hot water at <span class="math">\(90 \,^{\circ} \text{C}\)</span> will enter the mixing tee halfway up (<span class="math">\(15 \,\text{cm}\)</span> along the pipe) via a <span class="math">\(3 \,\text{cm}\)</span> ⌀, <span class="math">\(15 \,\text{cm}\)</span> long section of pipe at a volumetric rate of <span class="math">\(20 \,\text{cm}^{3} \cdot \text{s}^{-1}\)</span>.</p>
+<p><span class="math">\[
+\begin{align}
+\rho_{\text{water}} &amp; = 1 \,\text{g} \cdot \text{cm}^{-3} \\
+\mu_{\text{water}}  &amp; = 0.01 \,\text{cP} = 0.01 \,\text{g} \cdot \text{cm}^{-1} \cdot \text{s}^{-1}
+\end{align}
+\]</span></p>
+
+<p>At this point, we circle back around to the beginning: having seen how the results turn out given a mesh, we will now generate a mesh from a geometry.</p>
+<p><a id='ex-2-pre'></a></p>
+<h2 id="preprocessing">Preprocessing</h2>
+<ul>
+<li><img src="./img/lab1/lab1-workbench-blank.png" align="right" />Select <code>Fluid Flow (Fluent)</code> from under <code>Analysis Systems</code>. Drag it to the resulting box in the right-hand pane outlined in red. This creates a new Fluent project.</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-2-geom'></a></p>
+<h2 id="geometry">Geometry</h2>
+<ul>
+<li><img src="./img/lab1/lab1-workbench-geometry.png" align="right" /><p>Double-click on <img src="./img/ui/fluent-icon-geometry.png"> <code>Geometry</code> to open the ANSYS DesignModeler, the CAD system we will use to create our geometries. </p>
+<ul>
+<li><img src="./img/lab1/lab1-dm-units.png" align="right" /><p>In the first dialog box, select <code>Centimeter</code> as the base length unit.</p></li>
+<li><p>In the <code>Sketching Toolboxes</code> panel on the left, select <code>XYPlane</code> under the top-level node in the tree.</p></li>
+<li>Next, select the <code>Sketching</code> tab.
+<ul>
+<li><p>In the <code>Settings</code> panel, check the <code>Grid</code> option <code>Snap</code> and set the number of minor intervals to <code>2</code>. (This allows us to use half-centimeter increments in our plotting.)</p></li>
+<li><p>In the <code>Draw</code> panel, select <code>Rectangle</code>.</p></li>
+<li><p>Position your mouse cursor at <code>(-2.5, -15)</code>, click, and drag to <code>(2.5, 15)</code>. This creates a rectangle sketch, which represents the major pipe. (Make sure the coördinates are exact—it it difficult to move a sketch object in DesignModeler, and often easier to just delete your sketch and draw it again.)  In the <i>Details</i> view, name the sketch <code>mainpipe</code>.</p><table><tr><td><img src="./img/lab1/lab1-dm-sketching-rectangle.png" align="right" /></td><td><img src="./img/lab1/lab1-dm-viewport-rectangle.png" /></td></tr></table></li>
+<li><img src="./img/lab1/lab1-dm-toolbar-sketch.png" align="right" /><p>We will now create a new sketch by selecting the <code>New Sketch</code> button on the toolbar.</p></li>
+<li><p>Name the new <code>Sketch2</code> <code>sidepipe</code> and repeat the forgoing process for a rectangle from <code>(0, 1.5)</code> to <code>(-15, -1.5)</code> to represent the hot-water inlet pipe (this should abut or intersect the vertical pipe). <img src="./img/lab2/dm-viewport-rectangle-2d.png" /></p></li>
+</ul></li>
+<li>Select the <code>Modeling</code> tab. <code>mainpipe</code> and <code>sidepipe</code> should both appear under <code>XYPlane</code> in the tree. We will now generate these as objects.
+<ul>
+<li><p>Select <code>mainpipe</code> and then, in the <i>Main Menu</i>, select <code>Concept→Surface from Sketch</code>. With <code>mainpipe</code> still highlighted, click <code>Apply</code> for the <code>Base Objects</code> (the thickness should be <code>0</code>). Repeat this process with <code>sidepipe</code>.</p></li>
+<li><p>A small lightning bolt <img src="./img/ui/fluent-icon-generate.png" style="vertical-align:bottom"> has appeared next to the new entries <code>SurfaceSk1</code> and <code>SurfaceSk2</code> in the tree. This universally means that you need to press the <code>Generate</code> button <img src="./img/ui/fluent-button-generate.png" style="vertical-align:bottom">. Do this now.</p></li>
+<li><p>Two intersecting gray rectangles appear, indicating that we have successfully created this object.</p></li>
+</ul></li>
+<li><p>We now have a complete geometry. Save this project and return to the ANSYS Workbench.</p></li>
+</ul></li>
+</ul>
+<table align="center"><tr><td><img src="./img/lab2/dm-mixing-tee-2d.png" height="350px" /></td><td><img src="./img/lab2/dm-mixing-tee-isometric-2d.png" height="350px" /></td></tr></table>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-2-mesh'></a></p>
+<h2 id="mesh">Mesh</h2>
+<ul>
+<li>Note that whereas we formerly had only question marks <img src="" /> next to the steps in the project schematic, the <code>Geometry</code> entry now has a check mark <img src="" /> and the <code>Mesh</code> entry has a pending symbol <img src="" />. Double-click on <code>Mesh</code> to enter the ANSYS Meshing tool.
+<ul>
+<li>Your geometry should be displayed in an isometric three-dimensional view. You may adjust your unit system back to cgs by selecting the appropriate option under the <code>Unit</code> menu.</li>
+<li>Note that you can select various pieces of the geometry independently by clicking on each surface. This is a result of having your cursor in <code>Face</code> detection mode <img src="./img/ui/fluent-button-face.png" />.</li>
+<li>We will use this to define inlets, outlets, and boundary conditions eventually, but for now we need to do only two things: create named regions (for BC definition later) and create a meshing strategy for each segment of the project.</li>
+<li>Select <code>Model→Mesh</code> in the <code>Outline</code> tree at left.
+<ul>
+<li>In the <code>Details</code> pane, verify that the <code>Physics Preference</code> is <code>CFD</code> and the <code>Solver Preference</code> is <code>Fluent</code>.</li>
+<li><img src="./img/lab1/lab1-meshing-method.png" align="right" />Right-click on <code>Mesh</code> and select <code>Insert→Method</code> (make certain that no faces are selected or this won't appear).
+<ul>
+<li><code>Automatic Method</code> appears as an option.</li>
+</ul></li>
+<li>In the <code>Details</code> pane, click <code>Geometry</code> and then select the mixing tee object. Click <code>Apply</code>.</li>
+<li>Click either <code>Update</code> or <code>Generate Mesh</code>.
+<ul>
+<li>A progress meter appears briefly while the mesh is generated.</li>
+<li>This mesh is blocky and likely inadequate.  We will insert a <code>Mapped Face Meshing</code> and <code>Sizing</code> in order to refine it.</li>
+</ul>
+<table align="center"><tr><td><img src="./img/lab2/dm-mesh-mixing-tee-blocky.png" height="350px" /></td><td><img src="./img/lab2/dm-mesh-mixing-tee-fine.png" height="350px" /></td></tr></table>
+</li>
+</ul></li>
+<li>We now need to create named areas to refer to in creating boundary conditions.
+<ul>
+<li>Click the <code>Select Edge</code> button.</li>
+<li><img src="./img/lab2/mesh-create-named-selection.png" align="right"/>Rotate the pipe up slightly and select the bottom <span class="math">\(y\)</span>-inlet face. Right-click on it and select <code>Create Named Selection</code>.
+<ul>
+<li><p></p><p>Name this face <code>inlet-y</code>.</p></li>
+</ul></li>
+<li>Repeat this process for <code>inlet-x</code> and <code>outlet-y</code>. <!--        - Finally, select both the pipe surfaces by clicking and dragging across them both.  Name this selection `wall-solid`. TODO:should we do this?--></li>
+</ul><img src="./img/lab2/mesh-named-selections.png" align="center"/></li>
+<li>Return to the ANSYS Workbench by closing this window.</li>
+</ul></li>
+<li>The <code>Mesh</code> entry often does not automatically update. Select <code>Update Project</code> to force it to update. This takes a few moments. (Incidentally, save often!)</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-2-setup'></a></p>
+<h2 id="setup">Setup</h2>
+<ul>
+<li><p>Now open up <code>Setup</code>.</p>
+<ul>
+<li>Select <code>Double Precision</code>.</li>
+<li>A number of warnings and messages appear as the mesh is loaded and compared.</li>
+</ul></li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-2-redux'></a></p>
+<h2 id="redux">Redux</h2>
+<ul>
+<li><p>We've been here before, though, and solved this in the first workshop.  Now, we could just run back to that tutorial and repeat the identical steps as before (setting up boundary conditions, solving, and plotting the results), but let's make things a bit more interesting.  Let's increase the flow rate of the inlet streams in order to render the system turbulent. We'll render the problem thus: cold water at <span class="math">\(10 \,^{\circ} \text{C}\)</span> will flow into a <span class="math">\(5 \,\text{cm}\)</span> ⌀, <span class="math">\(30 \,\text{cm}\)</span> long section of pipe at a linear rate of <span class="math">\(5 \,\text{cm} \cdot \text{s}^{-1}\)</span>. Hot water at <span class="math">\(90 \,^{\circ} \text{C}\)</span> will enter the mixing tee halfway up (<span class="math">\(15 \,\text{cm}\)</span> along the pipe) via a <span class="math">\(3 \,\text{cm}\)</span> ⌀, <span class="math">\(15 \,\text{cm}\)</span> long section of pipe at a linear rate of <span class="math">\(3 \,\text{cm} \cdot \text{s}^{-1}\)</span>.</p>
+
+<img src="./img/lab1/lab1-setup-problem.png" width="100%"/>
+
+<p>Now calculate the Reynolds numbers of each flow:</p></li>
+</ul>
+
+<div class="input_area">
+<pre>
+rho_water = 1.0  # g·cm^-3
+mu_water  = 0.01 # g·cm^-1·s^-1
+
+# Calculate Reynolds number of cold inlet flow.
+D_z = 5.0 # cm
+v_z = 3.0 # cm·s^-1
+Re_z = rho_water * v_z * D_z / mu_water;
+print('Re_z = ', Re_z)
+</pre>
+</div>
+
+<div class="output_area">
+<pre>
+Re_z =  1500.0
+</pre>
+</div>
+
+<div class="input_area">
+<pre>
+# Calculate Reynolds number of hot inlet flow.
+D_y = 3.0 # cm
+v_y = 3.0 # cm·s^-1
+Re_y = rho_water * v_y * D_y / mu_water;
+print('Re_y = ', Re_y)
+</pre>
+</div>
+
+<div class="output_area">
+<pre>
+Re_y =  900.0
+</pre>
+</div>
+
+<div class="input_area">
+<pre>
+from math import pi
+
+# Calculate total outlet volumetric flow rate from component inlets.
+A_y   = pi*D_y**2/4  # cm^2
+V_y   = A_y * v_y    # cm^3·s^-1
+
+A_z   = pi*D_z**2/4  # cm^2
+V_z   = A_z * v_z    # cm^3·s^-1
+
+V_out = V_y + V_z # cm^3·s^-1
+D_out = D_z  # cm
+A_out = A_z  # cm^2
+
+# Calculate Reynolds number of outlet flow.
+v_out = V_out / A_out # cm·s^-1
+print('v_out = ', v_out)
+
+Re_out = rho_water * v_out * D_out / mu_water;
+print('Re_out = ', Re_out)
+</pre>
+</div>
+
+<div class="output_area">
+<pre>
+v_out =  4.08
+Re_out =  2039.9999999999998
+</pre>
+<p>We thus expect the flow to be at least transitional if not fully turbulent.</p>
+</div>
+
+<hr />
+<p>You can do everything the same as before with two exceptions: adding a turbulence model because the resulting flow is higher (although not <em>quite</em> formally turbulent, there are likely to be pockets of turbulence in the flow); and specifying the behavior and quantities of that turbulence model's equations.</p>
+
+</div>
+<p><a id='ex-2-redux-models'></a></p>
+<h2 id="redux-models">Models</h2>
+<p>Add the energy and turbulence equations into the model to be solved.</p>
+<ul>
+<li><p>Double click on <code>Viscous</code> and select the <code>Standard</code> <span class="math">\(k\)</span>–<span class="math">\(\epsilon\)</span> model.</p>
+<table><tr><td><img src="./img/lab2/setup-energy.png" /></td><td><img src="./img/lab2/setup-turbulence.png" /></td></tr></table>
+</li>
+</ul>
+
+<p><a id='ex-2-redux-mesh'></a></p>
+<h2 id="redux-mesh">Solution Methods</h2>
+<p>You need to specify the numerical treatment of the turbulent model terms.</p>
+<div class="figure">
+<img src="./img/lab1/lab1-meshing-setup.png" />
+
+<p>The remainder of your solution will proceed as it did <a href="./1.1-intro-mixing-tee.html">in the first lesson</a>—with the exception of the increase in inlet flow velocities!  (My simulation converged in 73 steps when I used <code>Standard initialization</code>.)  When you have completed the exercise, take a cross-section of the flow velocity at the outlet in order to compare it to the laminar case and the <a href="3.3-mixing-tee-redux-3d.html">next 3D case</a>.</p>
+</td></tr></table>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+
+</div>
+</body>
+</html>

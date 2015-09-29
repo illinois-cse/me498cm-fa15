@@ -1,0 +1,111 @@
+<h1 id="preprocessing">Preprocessing</h1>
+<p>Prior to any simulation solution, you must create the physical model and associated mesh to which boundary conditions will be attached. This procedure is collectively known as <em>preprocessing</em>.</p>
+<h2 id="geometry">Geometry</h2>
+<h3 id="generate-geometry-using-ansys">Generate geometry using ANSYS</h3>
+<ol style="list-style-type: decimal">
+<li><p>Create basic 2D geometries and specify dimensions.</p>
+<ul>
+<li><a href="./pipe-2d.html">2D rectangle</a></li>
+</ul></li>
+<li><p>Generate 3D geometries based on 2D sketches using <strong><em>extrude</em></strong>, <strong><em>revolve</em></strong>, and so forth.</p>
+<ul>
+<li><a href="./pipe-3d.html">3D cylinder</a></li>
+</ul></li>
+<li><p>Composite geometries</p>
+<ul>
+<li><p><a href="./mixing-tee-2d.html">2D composite</a></p></li>
+<li><p><a href="./mixing-tee-3d.html">3D mixing tee</a></p></li>
+</ul></li>
+<li><p>Difference between <code>add material</code> and <code>add frozen</code></p>
+<ul>
+<li><p>Adding material will automatically merge all connected solid bodies together and result in one single body</p></li>
+<li><p>Adding frozen will keep solid bodies distinct so that users can work on them individually. But separate frozen bodies must be united into the same part in order to have interactions such as heat transfer.</p></li>
+</ul></li>
+</ol>
+<h3 id="import-geometry">Import geometry</h3>
+<p>Although throughout this course we will use ANSYS <em>DesignModeler</em> to construct models, it is generally easier for you to use a dedicated CAD program to construct nontrivial models. So that you can see this import process and understand some of its difficulties, we will import a part describing a Venturi flow geometry.</p>
+<p>First, download the file <a href="./data/venturi.sldprt"><code>venturi.sldprt</code></a>, a SolidWorks model. Open ANSYS Workbench and add the component <code>Mechanical Model</code> to the <code>Project Schematic</code>. Double-click on <code>Model</code> to open <em>DesignModeler</em>, where you can <code>File→Import External Geometry File...</code> <code>venturi.sldprt</code>. You can manipulate and rotate this model now.</p>
+<p>But there's a catch! Recall that Fluent requires a description of the <em>negative</em> space, the space through which the fluid will flow. This model file won't work for that, since any mesh will fill the solid portion of the part. Fortunately, most CAD tools include a tool we can use to invert the occupied volume and render the part suitable for CFD simulation: boolean subtraction. In <em>DesignModeler</em>, this is called <code>Enclosure</code>, but it doesn't work properly if there is a lot of external junk to subtract as well. In this case, we need to extract the set of inner surfaces and use them to define a new flow volume.</p>
+<ul>
+<li><p>Pull up DesignModeler and <code>Open</code> <code>venturi.sldprt</code>.</p></li>
+<li><p>Click on the blue axis dot to orient the part in the viewport.</p></li>
+<li><p><code>Concept→Detach</code> to get all of the pieces apart.</p></li>
+<li><p><code>Concept→Surfaces from Faces</code>, then select <em>all</em> of the appropriate faces. Use the planes graphic in the lower left of the viewport to select hidden faces. This must be done very patiently for complex geometries; just make sure that you have all contiguous faces from the interior as one surface.</p></li>
+<li><p>Fill in the gaps by creating <code>Concept→Surfaces from Edges</code> on the ends of the channel. (Don't forget the tops of the tubes.)</p></li>
+<li><p>Now join all of these together into a single part by selecting them under the <code>X Parts, Y, Bodies</code> entry.</p></li>
+<li><p>A common problem is that DM has not connected all model surfaces at the edges. To see if this is the case, turn on <code>View→Edge Joints</code> and then <code>View→Graphics Options→Edge Coloring→By Connection</code>.</p>
+<p>To fix this, use <code>Create→Body Operations</code> and <code>Sew</code> all of the pieces together at the joints. (Set <code>Create Solids?</code> to <code>Yes</code> and set an appropriate <code>User Tolerance</code> and <code>Merge Bodies</code>.) This should create a solid part.</p></li>
+<li><p>Now we can <code>Tools→Fill</code> the part to create our negative volume.</p></li>
+<li><p>Make a <code>Rectangle</code> in the <code>Front Plane</code> around the main body, then <code>Boss—Extrude</code> it forward and backwards <code>0.75 in</code>. This is a bounding cube we will use to trim the part down.</p></li>
+<li><p>Right-click on the <em>Toolbar</em> and <code>Customize→Command→Features→Combine</code>. <!-- http://help.solidworks.com/2015/English/SolidWorks/sldworks/c_combine_bodies.htm --></p></li>
+</ul>
+<p>Although this process is fairly involved, basically it involves creating a mold shape around the part, taking an inverse (or cavity) of the piece, and then trimming or deleting extraneous portions. Some information may be found in <a href="https://grabcad.com/questions/tutorial-solidworks-mold-tools">this tutorial</a>. <!--https://forum.solidworks.com/thread/47483--></p>
+<ul>
+<li><p>Pull up SolidWorks and <code>Open</code> <code>venturi.sldprt</code>.</p></li>
+<li><p>Click on the <span class="math"><em>z</em></span> axis to orient the part in the viewport.</p></li>
+<li><p>Make a <code>Rectangle</code> in the <code>Front Plane</code> around the main body, then <code>Boss—Extrude</code> it forward and backwards <code>0.75 in</code>. This is a bounding cube we will use to trim the part down.</p></li>
+<li><p>Right-click on the <em>Toolbar</em> to open the <em>Command Manager</em> and activate <em>Mold Tools</em>. Right-click and <code>Customize→Command→Mold Tools→Cavity</code>.</p></li>
+</ul>
+<h2 id="meshing">Meshing</h2>
+<ol style="list-style-type: decimal">
+<li><p>2D case</p>
+<ul>
+<li><p>Mesh a 2D rectangular domain. Apply global sizing first and then apply local sizing on the edges to refine the boundary layer.</p></li>
+<li><p>Global sizing</p>
+<ul>
+<li>Access: <strong><em>Mesh -&gt; Sizing</em></strong></li>
+</ul></li>
+<li><p>Local sizing</p>
+<ul>
+<li>Access: <strong>Right click on desired location (edge, face, or volume) -&gt; <em>Insert</em> -&gt; <em>Sizing</em></strong></li>
+</ul></li>
+</ul></li>
+<li><p>3D case</p>
+<ul>
+<li><p>Mesh a 3D cylinder. Generate a rough mesh.</p></li>
+<li><p><strong>Right click on either end of the cylinder (face) -&gt; <em>Insert</em> -&gt; Inflation</strong>. Select the circumference of the face as <strong><em>Boundary</em></strong>. Generate the mesh again and see the effect of refinement along the boundary.</p></li>
+</ul></li>
+<li><p>Named selections</p></li>
+<li><p>Quality metrics</p>
+<ul>
+<li><p>Good quality metrics do not necessarily mean good mesh. Other considerations like overall resolution and distribution of elements.</p></li>
+<li><p>Access: <strong><em>Mesh -&gt; Statistics -&gt; Mesh Metric</em></strong></p></li>
+<li><p>Element Quality: area or volume over sum of the square of the edge lengths. It measures how far elements are from being perfect. For example, a value of 1 indicates a perfect tetrahedron or cube, whereas 0 means a terrible element.</p></li>
+<li><p>Aspect ratio: basically ratio of the longest edge to the shortest edge (actual calculation more complicated). Should not exceed 100.</p></li>
+<li><p>Skewness: determines how close to ideal (i.e., equilateral or equiangular) a face or cell is.</p></li>
+<li><p>Orthogonal quality: similar to skewness, but on a reverse scale.</p></li>
+</ul></li>
+</ol>
+<table>
+<thead>
+<tr class="header">
+<th align="left"></th>
+<th align="center">Inacceptable</th>
+<th align="center">Bad</th>
+<th align="center">Acceptable</th>
+<th align="center">Good</th>
+<th align="center">Very good</th>
+<th align="center">Excellent</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Skewness</td>
+<td align="center">0.98-1.00</td>
+<td align="center">0.95-0.97</td>
+<td align="center">0.80-0.94</td>
+<td align="center">0.50-0.80</td>
+<td align="center">0.25-0.50</td>
+<td align="center">0-0.25</td>
+</tr>
+<tr class="even">
+<td align="left">OQ</td>
+<td align="center">0-0.001</td>
+<td align="center">0.001-0.10</td>
+<td align="center">0.10-0.20</td>
+<td align="center">0.20-0.69</td>
+<td align="center">0.70-0.95</td>
+<td align="center">0.95-1.00</td>
+</tr>
+</tbody>
+</table>

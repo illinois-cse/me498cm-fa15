@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>3. Composite Geometry</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+    <section id="heading" class="clearfix">
+      <table><tr><td>
+      <div id="logo-heading">
+        <img src="../img/fluent-logo1.png"/>
+      </div>
+      </td></tr><tr><td>
+      <h2 id="composite-geometry">3. Composite Geometry</h2>
+      <h5 id="april-9-2015-computational-science-and-engineering">April 9, 2015 • Computational Science and Engineering</h5>
+      </td></tr></table>
+    </section>
+
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-3-1">Exercise 3.1:  Complicated Geometry (in 2D)</a>
+<ul>
+<li><a href="#ex-3-1-Display">Displaying a Grid</a></li>
+<li><a href="#ex-3-1-Make">Making Composite Geometries</a></li>
+<li><a href="#ex-3-1-Holes">Making Geometries with Holes</a></li>
+</ul></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+
+<table><tr><td>
+<hr />
+<p><a id='ex-3-1'></a></p>
+<h2 id="Exercise-3.1-2D-Composite-Geometry">Exercise 3.1:  Complicated Geometry (in 2D)</h2>
+<p>Today, we will create a complex 2D part and explore the basic mechanism of generating composite geometries in ANSYS Fluent.</p>
+
+<ol>
+<li>Open ANSYS Workbench, and create <code>FLUENT</code> project. Then launch the <code>Geometry</code> module.</li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-3-1-Display'></a></p>
+<h3 id="Displaying-grid">Displaying a Grid<a class="anchor-link" href="#Displaying-grid">&#182;</a></h3><p>You can choose to display a grid to help you make sketches.</p>
+<ul>
+<li>Right click on <code>XYPlane</code> and select <code>Look at</code>.</li>
+<li>On the <code>Sketching</code> tab go down and select <code>Settings</code>. </li>
+<li>On the <code>Grid</code> section, check <code>Show in 2D</code> and the grid will be displayed on the XY plane. </li>
+</ul>
+<p>In the Graphics window, the solid lines are major grids, and the dash lines are minor grids. 
+After checking the <code>Snap</code> option, the cursor can only leap discretely from one grid point to another (which means it is snapped to grid points).</p>
+<p><img src="./img/lab3/image1.png" alt=""></p>
+<ul>
+<li>You can change the spacing between Major and Minor grids by going to <code>Major-Grid Spacing</code> or <code>Minor-Steps per Major</code> and changing the values.</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-3-1-Make'></a></p>
+<h3 id="Making-composite-geometries">Making Composite Geometries<a class="anchor-link" href="#Making-composite-geometries">&#182;</a></h3><p>However complex they are, composite geometries are made up of a series of basic elements such as straight lines and curves. The technique is to mark the borders of the geometry, and then fill space enclosed by these borders.</p>
+<p><img src="./img/lab3/image2.png" width="600px;"></p>
+<ul>
+<li>We will first draw a $90 \,^{\circ}$ bend using only straight lines.<ul>
+<li>Go to the <code>Sketching</code> tab and select <code>Draw</code>. Then select <code>Line</code>. </li>
+<li>Draw a line from the $Origin$ to point $A$ ($0$,$-20$), assuming you accept the default settings of grid. </li>
+<li>Draw another line from point $A$ to point $B$ ($-5$,$-20$). </li>
+<li>Do the same from point $B$ to point $C$ ($-5$,$5$), $C$ to $D$ ($20$,$5$), $D$ to $E$ ($20$,$0$), and finally $E$ back to the $Origin$. </li>
+<li>Now you have to enclose a cavity by the lines you just drew. From <code>Concepts</code> on the toolbar, select <code>Surface from Sketches</code>.</li>
+<li>Don't forget to click on <code>Generate</code>.</li>
+</ul>
+</li>
+</ul>
+<p><img src="./img/lab3/image3.png" width="600px;"></p>
+<p>You should see something like the figure above. Delete the surface and the sketch for the next practice.</p>
+<p><img src="./img/lab3/image4.png" width="600px;"></p>
+<ul>
+<li>Next, we make the $90 \,^{\circ}$ bend with both lines and arcs.<ul>
+<li>Draw a line from $O$ ($0$,$-5$) to $A$ ($0$,$-20$). Be careful that the positions may have changed. </li>
+<li>Draw another line from $B$ ($-5$,$-20$) to $C$ ($-5$,$-5$). </li>
+<li>From the <code>Draw</code> tab select <code>Arc by Tangent</code><img src="./img/icon-arcbytangent.png" alt="">. Click on $C$ to start the arc, and click on $T$ ($5$,$5$) again to end it. </li>
+<li>Switch back to line drawing and connect $T$ to $D$ ($20$,$5$), $D$ to $E$ ($20$,$0$), and $E$ to $P$ ($5$,$0$). </li>
+<li>Draw another <code>Arc by Tangent</code> from $P$ to $O$. </li>
+<li>Use <code>Surface from Sketches</code>  to create a surface from the sketch which you just created.</li>
+<li>Don't forget to click <code>Generate</code>.</li>
+</ul>
+</li>
+</ul>
+<p><img src="./img/lab3/image5.png" width="600px;"></p>
+<p>You can create other $2D$ geometries which you find interesting using other drawing tools available.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-3-1-Holes'></a></p>
+<h3 id="Geometries-with-Holes">Making Geometries with Holes<a class="anchor-link" href="#Geometries-with-Holes">&#182;</a></h3><p>Sometimes problems arise such that you need to create a hollow space within a fluid body. For example if you want to simulate external flow past a cylinder. Usually we don’t need to explicitly model the obstruction, unless there is something interesting about it, such as heat generation. Instead, we exclude the obstruction from the geometry.</p>
+<ul>
+<li>Let’s make a rectangle with a void circle within. <ul>
+<li>First, draw a rectangle of $10 \,\text{m}$ x $8\,\text{m}$ using the <code>Rectangle</code> tool from the <code>Draw</code> tab. Directly follow this by drawing a circle within the rectangle of radius $2 \,\text{m}$ with centre at the $Origin$ using <code>Circle</code> tool from the <code>Draw</code> tab. </li>
+<li>Go to <code>Concept</code> and select <code>Surfaces from Sketches</code>. In <code>Base Objects</code> select the sketch which you just made. This includes the rectangle as well as the circle.</li>
+<li>Again, don't forget to click <code>Generate</code>.</li>
+</ul>
+</li>
+</ul>
+<p><img src="./img/lab3/image6.png" width="600px;"></p>
+<blockquote><strong>Note</strong>:  In ANSYS, all drawings contribute to a single sketch unless you create a new sketch by clicking <code>New Sketch</code><img src="./img/icon-newsketch.png"> in the toolbar.</blockquote>
+
+<p>The final step in using a CFD solver application is <em>postprocessing</em>:  visualization and statistics which reveal the validity and predictions of the model.  Visualization includes taking slices through the control volume and plotting key variables, as well as plotting 2D or 3D isosurfaces.</p>
+<p>This laboratory exercise will introduce you to the framework of visualization in Fluent.  Since the focus in this case is on postprocessing, not problem preparation or execution, we provide the working files for the postprocessing to utilize.</p>
+<ul>
+<li><a href="../data/3-composite-geometry.zip">Mesh file</a></li>
+</ul>
+</td></tr></table>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+
+</div>
+</body>
+</html>
