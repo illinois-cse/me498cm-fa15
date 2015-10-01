@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Heat Transfer in a Tube Bank</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<h1 id="ansys-fluent-cfd-a-short-course-for-engineers">ANSYS® Fluent CFD: A Short Course for Engineers</h1>
+<h2 id="workflow">Heat Transfer in a Tube Bank</h2>
+<h5 id="april-6-2015-computational-science-and-engineering">Computational Science and Engineering</h5>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-7-1">Heat Transfer in a Tube Bank</a><ul>
+<li><a href="#ex-7-1-Intro">Introduction</a></li>
+<li><a href="#ex-7-1-Geom">Geometry</a></li>
+<li><a href="#ex-7-1-Mesh">Mesh</a></li>
+<li><a href="#ex-7-1-Setup">Setup</a></li>
+<li><a href="#ex-7-1-Post">Post-processing</a></li>
+</ul>
+</li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-7-1'></a></p>
+<h2 id="Exercise-7.1-Heat-Transfer-in-a-Tube-Bank">Heat Transfer in a Tube Bank<a class="anchor-link" href="#Exercise-7.1-Heat-Transfer-in-a-Tube-Bank">&#182;</a></h2>
+<p><a id='ex-7-1-Intro'></a></p>
+<h3 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h3><p>Many industrial applications, such as steam generation in a boiler or air cooling in the coil of an air conditioner, can be modeled as two-dimensional periodic heat flow. This tutorial illustrates how to set up and solve a periodic heat transfer problem.<br>
+The system that is modeled is a bank of tubes containing a flowing fluid at one temperature that is immersed in a second fluid in cross flow at a different temperature. Both fluids are water, and the flow is classified as laminar and steady, with a Reynolds number of approximately $100$. The mass flow rate of the cross flow is known and the model is used to predict the flow and temperature fields that result from convective heat transfer.<br>
+Due to symmetry of the tube bank and the periodicity of the flow inherent in the tube bank geometry, only a portion of the geometry will be modeled in ANSYS FLUENT, with symmetry applied to the outer boundaries. The resulting mesh consists of a periodic module with symmetry. In the tutorial, the inlet boundary will be redefined as a periodic zone, and the outflow boundary defined as its shadow.<br>
+This problem considers a $2D$ section of a tube bank. The bank consists of uniformly spaced tubes with a diameter of $1\,\text{cm}$ which are staggered across the cross-fluid flow. Their centers are separated by a distance of $2\,\text{cm}$ in the $x$ direction, and $1\,\text{cm}$ in the $y$ direction. The bank has a depth of $1\,\text{m}$, a mass flow rate of $0.05\,\text{kg/s}$ is applied to the inlet boundary of the periodic module. The temperature of the tube wall (T_wall) is $400\,\text{K}$ and the bulk temperature of the corss flow water (T) is $300\,\text{K}$.</p>
+<p><img src="./img/lab7/geom.png" alt=""></p>
+<hr>
+<p><a id='ex-7-1-Geom'></a></p>
+<h3 id="Geometry">Geometry<a class="anchor-link" href="#Geometry">&#182;</a></h3><ul>
+<li>Open ANSYS Design Modeler and select $centimeter$ as the length unit. </li>
+<li>Use line and arc drawing tools to make the base sketch. </li>
+<li>Next, use dimension tools to scale the sketch (dimensions shown in the below picture). </li>
+<li>Last, make a surface from the sketch. </li>
+</ul>
+<p><img src="./img/lab7/geom1.png" alt="" width="100%"></p>
+<hr>
+<p><a id='ex-7-1-Mesh'></a></p>
+<h3 id="Mesh">Mesh<a class="anchor-link" href="#Mesh">&#182;</a></h3><ul>
+<li>Open ANSYS Meshing.  </li>
+</ul>
+<p>Unfortunately, we cannot use a mapped face meshing for this geometry. So let’s stick to unstructured mesh.</p>
+<ul>
+<li>Change the <code>Max Face Size</code> to $2.5×10^{-4}\,\text{m}$ </li>
+</ul>
+<p>$Note:$ ANSYS works in $meter$ from here.</p>
+<ul>
+<li>Generate and examine the mesh.</li>
+</ul>
+<p>It looks fine in general. However, we want finer mesh around the tubes to resolve the thermal gradient. Assigning refined grids near certain boundaries is called $Inflation$ in ANSYS.</p>
+<ul>
+<li>Select the <code>Mesh</code> in the <code>Outline</code> window and right click on it -&gt; <code>Insert</code> -&gt; <code>Inflation</code>.</li>
+</ul>
+<p><img src="./img/lab7/inflation.png" alt=""></p>
+<ul>
+<li>In the <code>Details of Inflation</code>, select the $2$ semicircles as the <code>Boundary</code> (hold <code>Ctrl</code> key on the keyboard to select multiple edges). </li>
+<li>Change the <code>Inflation Option</code> to <code>First Layer Thickness</code>, and enter $1×10^{-4}\,\text{m}$ for the <code>First Layer Height</code> and $5$ for the <code>Maximum Layers</code>.</li>
+<li>Keep the <code>Growth Rate</code> as $1.2$.</li>
+</ul>
+<p><img src="./img/lab7/inflation1.png" alt=""></p>
+<ul>
+<li>Now generate the mesh again.</li>
+</ul>
+<p><img src="./img/lab7/mesh.png" alt="" width="100%"></p>
+<p>Notice the change around the tubes.</p>
+<ul>
+<li>Name the left boundary as “inlet”, the right “outlet”, the semicircles “tube_wall”, top two edges “symmetry_top”, and bottom two edges “symmetry_bottom”. </li>
+</ul>
+<hr>
+<p><a id='ex-7-1-Setup'></a></p>
+<h3 id="Setup">Setup<a class="anchor-link" href="#Setup">&#182;</a></h3><ul>
+<li>Open FLUENT and select double precision. </li>
+<li>In the <code>Models</code>, turn on <code>Energy Equation</code>.</li>
+<li>In the <code>Materials</code>, create <code>water-liquid</code> from FLUENT database.</li>
+<li>In the <code>Cell Zone Conditions</code>, change the material in <code>surface_body</code> zone to <code>water-liquid</code>. </li>
+<li>In the <code>Boundary Conditions</code>, make sure the symmetric boundaries are of type <code>symmetry</code>. </li>
+<li>Edit the <code>tube_wall</code> to make its temperature fixed at $400\,\text{K}$. </li>
+</ul>
+<p><img src="./img/lab7/wall.png" alt=""></p>
+<p>Next, we will make the inlet and outlet boundaries $periodic$.</p>
+<ul>
+<li>Find out their $ID’s$ (next to the boundary type). </li>
+<li>Go to the <code>text user interface</code> and type in “mesh/modify-zones/make-periodic”.</li>
+<li>Enter the inlet ID for $Periodic$ $zone$ $[()]$, and hit enter.</li>
+<li>Enter the outlet ID for $Shadow$ $zone$ and type "no" for $Rotational$ $periodic$, and then twice type "yes".</li>
+</ul>
+<p><img src="./img/lab7/periodic.png" alt=""></p>
+<ul>
+<li>Note that a new <img src="./img/icon-periodicconditions.png" alt=""> button appears . </li>
+<li>Click on it to open the <code>Periodic Conditions</code> window.</li>
+<li>Choose <code>Specify Mass Flow</code>, and enter $0.05$ for the mass flow rate. Keep the rest settings as default. </li>
+<li>Go to <code>Solution Controls</code>, and change the <code>Under-Relaxation Factors</code> of Energy to $0.9$ for better convergence. </li>
+<li>Initialize the solution using <code>Standard Initialization</code>, and run $1000$ iterations.</li>
+<li>Note how the residuals decrease. </li>
+</ul>
+<hr>
+<p><a id='ex-7-1-Post'></a></p>
+<h3 id="Post-processing">Post-processing<a class="anchor-link" href="#Post-processing">&#182;</a></h3><p>In FLUENT, you can display mirror images if there is a symmetric boundary.</p>
+<ul>
+<li>Go to <code>Graphics and Animations</code> and click the <code>Views…</code> <img src="./img/icon-views.png" alt=""> button.</li>
+<li>Select both <code>symmetry_top</code> and <code>symmetry_bottom</code> in the <code>Mirror Planes</code> list, and click <code>Apply</code>.</li>
+</ul>
+<p>Now you can plot contours and streamlines as usual and notice the difference.</p>
+<p><img src="./img/lab7/temperature.png" alt=""></p>
+</td></tr></table>
+
+
+<hr />
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</body>
+</html>

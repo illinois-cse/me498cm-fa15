@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Natural Convection in a Square Cavity</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<h1 id="ansys-fluent-cfd-a-short-course-for-engineers">ANSYS® Fluent CFD: A Short Course for Engineers</h1>
+<h2 id="workflow">3.  Natural Convection</h2>
+<h5 id="april-6-2015-computational-science-and-engineering">Computational Science and Engineering</h5>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-6-1">Natural Convection in a Square Cavity</a></li>
+<li><a href="#ex-6-1-Intro">Introduction</a></li>
+<li><a href="#ex-6-1-Geom&mesh">Geometry and Mesh</a></li>
+<li><a href="#ex-6-1-Setup">Setup</a></li>
+<li><a href="#ex-6-1-Post">Post-processing</a></li>
+
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+
+<table><tr><td>
+<hr />
+<h2 id="ex-6-1">Natural Conection in a Square Cavity<a class="anchor-link" href="#ex-6-1">&#182;</a></h2><hr>
+<p><a id='ex-6-1-Intro'></a></p>
+<h3 id="ex-6-1-Intro">Introduction<a class="anchor-link" href="#ex-6-1-Intro">&#182;</a></h3><p>Natural convection flows are encountered in various engineering applications. In this lab, you will solve a steady state natural convection problem in a 2D square cavity. The flow is induced by thermal differential between the left and right walls that are held at constant hot and cold temperatures, respectively. The top and bottom walls are insulated (i.e. zero heat flux). The fluid near the left wall ascends because it is hotter than the ambient, while the fluid near the right wall descends because it is cooler, hence generating a clockwise vertex. The phenomenon is characterized by Rayleigh number:</p>
+<p><img src="./img/lab6/rayleigh.png" alt=""></p>
+<p>In this formula,</p>
+<p>$L$ $=$ Length of the plate</p>
+<p>$T_H$ $=$ Temperature of hot edge</p>
+<p>$T_C$ $=$ Temperature of cold edge</p>
+<p>$g$ $=$ Acceleration due to gravity</p>
+<p>&#946; $=$ Thermal Expansion Coefficient</p>
+<p>&#961; = Density</p>
+<p>&#956; = Dynamic Viscosity</p>
+<p>&#945; = Thermal Diffusivity</p>
+<p><img src="./img/lab6/geometry.png" alt=""></p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<h3 id="ex-6-1-Geom&mesh">Geometry and Mesh<a class="anchor-link" href="#ex-6-1-Geom&mesh">&#182;</a></h3><ul>
+<li>Download the <a href="../data/6-natural-convection.zip">Fluid Flow (Fluent)</a> Component System for this tutorial.</li>
+<li>Extract the files to a new folder and name it as you wish.</li>
+<li>Open the ANSYS Workbench file and select the <code>Mesh</code> Component System. </li>
+<li>After importing the downloaded mesh, transfer data to new <code>Fluent</code>. You can do this by right clicking the <code>Mesh</code> cell and then selecting <code>Transfer Data to New</code> and then select <code>Fluent</code>.</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<h3 id="ex-6-1-Setup">Setup<a class="anchor-link" href="#ex-6-1-Setup">&#182;</a></h3><ul>
+<li>You will solve a steady state laminar natural convection of Rayleigh number 10,000. <ul>
+<li>Enter FLUENT with <code>Double Precision</code>. </li>
+<li>Change temperature unit to $Celsius$. </li>
+<li>Go to <code>Materials</code> menu and change the density option to $boussinesq$ and type in the numbers as shown below.</li>
+</ul>
+</li>
+</ul>
+<p>The density is the &#961;$_0$ in the Boussinesq approximation.</p>
+<p><img src="./img/lab6/materials.png" alt=""></p>
+<p><img src="./img/lab6/materials2.png" alt=""></p>
+<ul>
+<li><p>Next, go to <code>Boundary Conditions</code> menu.</p>
+<ul>
+<li>Set the boundary conditions for the four walls.</li>
+<li>The top and bottom walls have zero heat flux. </li>
+<li>In order to set these, click on <code>Edit</code> after selecting <code>bottomwall</code>. Select the <code>Thermal</code> tab and select the <code>Heat Flux</code> option. Enter $0$ for <code>Heat Flux</code> and <code>Heat Generation Rate</code>.</li>
+<li><p>Set the same boundary condition for the top wall.</p>
+<p><img src="./img/lab6/heatflux.png" alt=""></p>
+</li>
+<li><p>The left and right walls have constant temperature at $1$ and $0$, respectively.  (This is arbitrary and will scale.)</p>
+</li>
+<li>In order to set these, click on <code>Edit</code> after selecting <code>leftwall</code>. Select the <code>Thermal</code> tab and then select <code>Temperature</code>. Enter $1$ for <code>Temperature</code>. </li>
+<li><p>Set the boundary condition of the right wall accordingly</p>
+<p><img src="./img/lab6/temperature.png" alt=""></p>
+</li>
+</ul>
+</li>
+<li><p>Now open the <code>Operating Conditions</code> menu in the <code>Boundary Conditions</code> section itself.</p>
+<ul>
+<li>Check the <code>Gravity</code> box and enter $-1$ in $Y$ direction. </li>
+<li>Enter $0.5$ for the <code>Operating Temperature</code> that corresponds to $T_0$ in the Boussinesq approximation. </li>
+<li>You do not need to specify operating density when using the Boussinesq approximation.</li>
+<li><p>Leave the <code>Specified Operating Density</code> unchecked.</p>
+<p><img src="./img/lab6/operatingconditions.png" alt=""></p>
+</li>
+</ul>
+</li>
+<li><p>Initialize and start the calculation. If your setup is correct, it should converge in $500$ iterations.</p>
+</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<h3 id="ex-6-1-Post">Post-processing<a class="anchor-link" href="#ex-6-1-Post">&#182;</a></h3><ul>
+<li>Plot the contours of temperature, pressure, and velocity. </li>
+</ul>
+<p><img src="./img/lab6/temperaturecontours.png" alt=""></p>
+<p><img src="./img/lab6/pressure.png" alt=""></p>
+<p><img src="./img/lab6/velocity.png" alt=""></p>
+<ul>
+<li>Plot the $Y$-velocity along the horizontal centerline and $X$-velocity along the vertical centerline.</li>
+</ul>
+<p><img src="./img/lab6/xvel.png" alt=""></p>
+<p><img src="./img/lab6/yvel.png" alt=""></p>
+<p>Do the results make sense? Compare your results to the benchmark solution (<a href="http://onlinelibrary.wiley.com/doi/10.1002/fld.1650030305/abstract">de Vahl Davis 1983</a>). The materials are different. So the magnitude will not match. However, the location of velocity maxima should be the same (in his notation, $u_m$$_a$$_x$ is max $X$-velocity, and $z$ is $Y$-axis; $w_m$$_a$$_x$ is max $Y$-velocity, and $x$ is $X$-axis).</p>
+<p>Is it a good simulation?</p>
+<p><img src="./img/lab6/reference.png" alt=""></p>
+</td></tr></table>
+
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</body>
+</html>
