@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Exercise 5.1:  Boundary Conditions and User Defined Functions (UDFs)</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<h1 id="ansys-fluent-cfd-a-short-course-for-engineers">ANSYS® Fluent CFD: A Short Course for Engineers</h1>
+<h2 id="workflow">5.1:  Boundary Conditions and User Defined Functions (UDFs)</h2>
+<h5 id="april-6-2015-computational-science-and-engineering">April 9, 2015 • Computational Science and Engineering</h5>
+<h2 id="contents">Contents</h2>
+<ul>
+<li>Exercise 5.1:  Boundary Conditions and User Defined Functions (UDFs)<ol>
+<li><a href="#ex-5-1-Intro">Introduction</a></li>
+<li><a href="#ex-5-1-Geom&mesh">Geometry and Mesh</a></li>
+<li><a href="#ex-5-1-Setup">Setup</a></li>
+<li><a href="#ex-5-1-Boundary">Boundary Conditions</a></li>
+<li><a href="#ex-5-1-Post">Post-processing</a></li>
+</ol></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+
+<table><tr><td>
+<hr />
+<h2>Exercise 5.1:  Boundary Conditions and User Defined Functions (UDFs)</h2>
+
+<h3 id="ex-5-1-Intro">Introduction<a class="anchor-link" href="#ex-5-1-Intro">&#182;</a></h3>
+<p>For this lab, you will simulate the steady flow in a two-dimensional journal bearing. This problem will employ a simple user-defined function (UDF) for treating the boundary conditions. As opposed to the previous problems, this time we will work in physical units.</p>
+<p>Create the geometry indicated below. Ensure that the circles have a common center that is not at the origin of the coordinate system, and record the value of the offset distances $x_0$ and $y_0$.</p>
+<p><img src="./img/lab5/geom.png" alt=""></p>
+<p>The inner radius $R_i$ is $6\,\text{mm}$ and the outer radius $R_o$ is $8\,\text{mm}$. The shaft rotates with angular frequency $1250\,\text{RPM}$. You are interested in calculating the stresses acting on the outer race.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-5-1-Geom&mesh'></a></p>
+<h3 id="Geometry-and-Mesh">Geometry and Mesh<a class="anchor-link" href="#Geometry-and-Mesh">&#182;</a></h3><ul>
+<li>In the Design Modeler software, start by selecting $mm$ based units when prompted (FLUENT will know how to translate back to meters). </li>
+<li>Activate <code>Auto Constraints</code> on Cursor. </li>
+<li>Draw $2$ circles in your domain. </li>
+<li>A small square will appear in the center of the first circle; click on it when you draw the second circle to get the concentric constraint. </li>
+<li>Use the radius dimension tool to supply the proper dimensions, and then use the <code>Length/Distance</code> dimension tool to locate the centers of the circles at convenient distances. </li>
+<li><p>Create a surface from the sketch.</p>
+</li>
+<li><p>In the meshing software, apply a Mapped Face Mesh to your domain, set the max face size to $0.2\,\text{mm}$, and generate the mesh.</p>
+</li>
+</ul>
+<blockquote><strong>Note</strong>:  The mesh geometry expects the length to be expressed in meters.</blockquote>
+<ul>
+<li>Create named sections for "inner" and "outer". </li>
+<li>Remember to update your steps in Workbench so that you get a green checkmark before proceeding.</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-5-1-Setup'></a></p>
+<h3 id="Setup">Setup<a class="anchor-link" href="#Setup">&#182;</a></h3><ul>
+<li>Double-click the <code>Setup</code> option in the project menu inside of Workbench. </li>
+<li>Start FLUENT in double precision, and wait for the software to load and check the mesh.</li>
+</ul>
+<p><img src="./img/lab5/general.png" alt=""></p>
+<ul>
+<li>In the <code>General</code> task page, click <code>Check</code>. The text window in FLUENT will indicate the extents of the domain, and note that it is aware that the geometry is created in $millimeter$. </li>
+<li>Accept the default settings in General and Models, and go to Materials.</li>
+<li>Click <code>Create/Edit</code>. Create a material called “grease” that has the following properties. </li>
+</ul>
+<p><img src="./img/lab5/materials.png" alt=""></p>
+<ul>
+<li>Click <code>Change/Create</code>. When asked whether to overwrite air, select <code>Yes</code>. </li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-5-1-Boundary'></a></p>
+<h3 id="Boundary-Conditions">Boundary Conditions<a class="anchor-link" href="#Boundary-Conditions">&#182;</a></h3><ul>
+<li>Go to <em>Boundary Conditions</em> in the left menu to change the interface. </li>
+<li>Ensure that the outer wall is a stationary wall. </li>
+<li>Examine the options for the inner wall.<ul>
+<li>Change the type to a moving wall with rotational components.</li>
+<li>Note that here, you can specify the speed and origin of rotation, but we are going to accomplish this with a user subroutine for the sake of example.</li>
+</ul>
+</li>
+<li>Create a new plain text file called <code>inner.c</code> and open it with your favorite text editor.</li>
+</ul>
+<p>We will be using the <code>DEFINE_PROFILE</code> macro twice to define the $x$ and $y$ velocity components of the inner bearing race. This guide will tell you what you need to know, but the <code>FLUENT UDF</code> manual is the ultimate resource.</p>
+<p>The first line of your file must be <code>#include "udf.h"</code> to get access to the FLUENT programming interface. Strictly speaking, you are defining macros, but they are discussed with the language of functions. (The Fluent UDF language is C, but a highly macro-ized version in order to better support the interface to Fluent.) The basics of the <code>DEFINE_PROFILE</code> macro are defined as follows (from the manual):</p>
+
+<blockquote>
+<table><tr>
+<td><code>DEFINE_PROFILE(name,t,i)</code></td>
+</tr><tr>
+<td><b>Argument Type</b></td>
+<td><b>Description</b></td>
+</tr><tr>
+<td><code>symbol name</code></td>
+<td>UDF name</td>
+</tr><tr>
+<td><code>Thread *t</code></td>
+<td>Pointer to thread on which boundary condition is to be applied.</td>
+</tr><tr>
+<td><code>int i</code></td>
+<td>Index identifying the variable that is to be defined.  <code>i</code> is set when you hook the UDF with a variable in a boundary conditions dialog box through the graphical user interface. This index is subsequently passed to your UDF by the ANSYS FLUENT solver so that your function knows which variable to operate on.</td>
+</tr><tr><td><b>Function returns</b></td>
+</tr><tr><td><code>void</code></td>
+</tr></table>
+</blockquote>
+
+<p>There are three arguments to <code>DEFINE_PROFILE</code>: <code>name</code>, <code>t</code>, and <code>i</code>. You supply <code>name</code>, the name of the UDF. <code>t</code> and <code>i</code> are variables that are passed by the ANSYS FLUENT solver to your UDF.</p>
+<p>So, to define our inner race velocity, the UDF will look something like</p>
+<pre>
+DEFINE_PROFILE(inner_vx, thread, index) 
+{ 
+real x[ND_ND];  // position vector, from FLUENT 
+real x0, y0;    // center of circle coordinates 
+real R, omega; 	// inner radius and angular velocity 
+face_t f;       // fluent face object 
+x0 = {the x-coordinate of the center of your circles}
+y0 = {the y-coordinate of the center of your circles}
+R  = {your inner radius, in meters}
+omega = {your angular velocity, in rpm}
+begin_f_loop(f, thread)
+{ 
+F_CENTROID(x, f, thread); // this fills the position vector 
+F_PROFILE(f, thread, index) = {a function we will define}
+} 
+end_f_loop(f, thread) 
+}
+</pre>
+<p>Some of this we ignore for the time being, like <code>face_t f</code>. (Note that the variable type is <code>real</code>; this turns into either <code>float</code>s or <code>double</code>s depending on how you are running Fluent (single vs. double precision).) The <code>begin_f_loop</code> and corresponding <code>end_f_loop</code> control a loop over cell faces within the specified geometry for the boundary conditions – FLUENT takes care of keeping track of which specific cells in the mesh get the boundary conditions for you.</p>
+<p>The call to <code>F_CENTROID</code> populates the $x$ vector with the coordinates of the current face centroid, so after the function call the value of <code>x[0]</code> is the $x$ coordinate and <code>x[1]</code> is the $y$ coordinate. What you type on the right side of the call to <code>F_PROFILE</code> will define the $x$ component of the velocity, which can be some user-specified function of coordinates. This macro will compute the $x$ velocity of the inner race. You will have to define a very similar second macro for the $y$ velocity. The name of the macro will change to <code>inner_vy</code> and the function for <code>F_PROFILE</code> will change accordingly. 
+The velocity components can be computed as:</p>
+<p><img src="./img/lab5/velocity.png" alt=""></p>
+<p>So we need to calculate theta. From the geometry, we can compute:</p>
+<p><img src="./img/lab5/theta.png" alt=""></p>
+<p>where we use the $C$ standard function <code>atan2 (y, x)</code>, and the coordinates are shifted to account for the center of rotation not being at the origin of the simulation domain. In addition, we will need to change the angular velocity from $RPM$ to $rad/s$:</p>
+<p><img src="./img/lab5/rpm.png" alt=""></p>
+<p>In the <code>inner_vx</code> function, the $x$ velocity is:</p>
+<p><code>F_PROFILE(f, thread, index) = -R * omega * sin(theta)</code></p>
+<p>And in the <code>inner_vy</code> function, the $y$ velocity is:</p>
+<p><code>F_PROFILE(f, thread, index) = R * omega * cos(theta)</code></p>
+<p>This completes the definition of the boundary conditions with the UDF.</p>
+<ul>
+<li>Save and close the text file.  (If you have persistent difficulties troubleshooting your code after this point, <a href="../data/inner.c">here</a> is a working copy of <code>inner.c</code>.)</li>
+<li>Go back to FLUENT, in the main menu on the top, execute <code>Define-&gt;User-Defined-&gt;Functions-&gt;Interpreted</code>, and browse for your <code>inner.c</code> file. </li>
+<li>Click the <code>Interpret</code> button, and look at the compiler output for any errors in your code. If everything works properly, when you edit the inner wall boundary conditions to define a moving wall by <code>Components</code>, you will have options in the pulldown boxes for <code>inner_vx</code> and <code>inner_vy</code>.</li>
+</ul>
+<p><img src="./img/lab5/bc.png" alt=""></p>
+<ul>
+<li>Initialize and run calculation. It should converge at about $100$ iterations. </li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-5-1-Post'></a></p>
+<h3 id="Post-processing">Post-processing<a class="anchor-link" href="#Post-processing">&#182;</a></h3><ul>
+<li>Create a vector plot colored by velocity magnitude and do a common-sense check: do the velocities look right for the described conditions of this problem? If your vectors are not all tangential to the inner radius, then there is a good chance that you have not correctly shifted your coordinates in the UDF.</li>
+</ul>
+<p>This problem is known as Taylor–Couette flow where the tangential velocity profile can be written as:</p>
+<p><img src="./img/lab5/coutte.png" alt=""></p>
+<p>where $r$ is the radial coordinate, $u_i$ is the velocity of the inner race, and $R_i$ and $R_o$ are inner and outer radii, respectively.<br>
+Create an $x$$-$$y$ plot of the tangential velocity across the grease film and compare with the analytical solution. Is this a good simulation?</p>
+</td></tr></table>
+
+<hr />
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</body>
+</html>
