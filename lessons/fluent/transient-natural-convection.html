@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Transient Natural Conection in a Square Cavity</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<h1 id="ansys-fluent-cfd-a-short-course-for-engineers">ANSYS® Fluent CFD: A Short Course for Engineers</h1>
+<h2 id="workflow">Transient Natural Convection</h2>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-6-2">Transient Natural Conection in a Square Cavity</a><ul>
+<li><a href="#ex-6-2-Intro">Introduction</a></li>
+<li><a href="#ex-6-2-Geom&mesh">Geometry and Mesh</a></li>
+<li><a href="#ex-6-2-Setup">Setup</a></li>
+<li><a href="#ex-6-2-Run">Run</a></li>
+<li><a href="#ex-6-2-Convergence">Convergence Criteria</a></li>
+<li><a href="#ex-6-2-Monitors">Creating New Surface Monitors</a></li>
+<li><a href="#ex-6-2-Animation">Setting Up Animation</a></li>
+<li><a href="#ex-6-2-Post">Run and Post-processing</a></li>
+
+<li><a href="#credits">Credits</a></li>
+</ul>
+
+
+<table><tr><td>
+<hr />
+<h2 id="Exercise-6.2-Transient-Natural-Conection-in-a-Square-Cavity">Exercise 6.2:  Transient Natural Conection in a Square Cavity<a class="anchor-link" href="#Exercise-6.2-Transient-Natural-Conection-in-a-Square-Cavity">&#182;</a></h2><hr>
+<h3 id="ex-6-2-Intro">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h3>
+<p>Now you will simulate the same problem as you did ex-6-2-Intro time, but you do it transiently. This lab will teach you to run a transient simulation as well as to make animated solution playback.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-6-2-Geom&mesh'></a></p>
+<h3 id="Geometry-and-Mesh">Geometry and Mesh<a class="anchor-link" href="#Geometry-and-Mesh">&#182;</a></h3><ul>
+<li>Geomerty and Mesh remain the same. Hence we can directly start from the <code>Setup</code>.</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-6-2-Setup'></a></p>
+<h3 id="ex-6-2-Setup">Setup<a class="anchor-link" href="#ex-6-2-Setup">&#182;</a></h3><ul>
+<li>Start FLUENT from your old project file. </li>
+<li>In the <code>General</code> menu, change the <code>Time</code> option to <code>Transient</code>. Keep the rest of setups same as last time. </li>
+</ul>
+<p><img src="./img/lab6/general.png" alt=""></p>
+<ul>
+<li>Go to <code>Solution Methods</code>. Note that a new option has appeared in the solution methods: <code>Transient Formulation</code>.</li>
+<li>Examine the options in the pull down menu and see the methods available. </li>
+<li>For now, we accept the <code>First Order Implicit scheme</code>.</li>
+</ul>
+<p><img src="./img/lab6/solutionmethods.png" alt=""></p>
+
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-6-2-Run'></a></p>
+<h3 id="ex-6-2-Run">Run<a class="anchor-link" href="#ex-6-2-Run">&#182;</a></h3><ul>
+<li>Initialize the solution and go to the <code>Run Calculation</code> menu. </li>
+<li>Change the <code>Time Step Size</code> to $1$, the <code>Number of Time Steps</code> to $20$ (giving a total simulation time of $20$ seconds), and leave the <code>Max Iterations/Time Step</code> at $20$. </li>
+<li>Hit the <code>Calculate</code> button.</li>
+</ul>
+<p><img src="./img/lab6/calculation1.png" alt=""></p>
+<p>The viewport will change to the residual against the iteration number. The $Sawtooth$ that you are seeing is the simulation starting a time step, reducing the residual by iterations, and then starting a new time step.</p>
+<p><img src="./img/lab6/sawtooth.png" alt=""></p>
+<ul>
+<li>After the calculation is completed, plot a temperature contour of the domain. </li>
+</ul>
+<p><img src="./img/lab6/temperaturecontour1.png" alt=""></p>
+<p>What is the contour telling you? The convection has yet to begin. The time step size of 1 second happens to be small relative to the evolution of this problem.</p>
+<ul>
+<li>Change the time step size to $10$ seconds and run for another $20$ time steps (do not initialize the solution). FLUENT will warn about changed settings; select <code>Use setting changes for current calculation only</code>.</li>
+<li><p>Keep an eye on the magnitude of residuals. They are all larger than that with the smaller time step.</p>
+</li>
+<li><p>Again, plot a temperature contour after the calculation. It should show a bit more action this time.</p>
+</li>
+</ul>
+<p><img src="./img/lab6/temperaturecontour2.png" alt=""></p>
+<p>We have expedited the evolution of solution at the price of reducing accuracy. Such tradeoff exists in any transient simulation.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-6-2-Convergence'></a></p>
+<h3 id="ex-6-2-Convergence">Convergence Criteria<a class="anchor-link" href="#ex-6-2-Convergence">&#182;</a></h3><ul>
+<li>Go to <code>Monitors</code> and double click <code>Residuals – Print, Plot</code>. </li>
+</ul>
+<p><img src="./img/lab6/monitors.png" alt=""></p>
+<p>We can change the way the residuals are monitored and their convergence in the window that appears.</p>
+<ul>
+<li>Change the <code>Convergence Criterion</code> from <code>absolute</code> to <code>relative</code>. </li>
+</ul>
+<p>If "absolute" criterion is chosen, the residual (scaled and/or normalized) of an equation at an iteration is compared with a user-specified value. If the residual is less than the user-specified value, that equation is deemed to have converged for a timestep.</p>
+<p>On the other hand, if "relative criterion" is selected, the residual of an equation at an iteration of a timestep is compared with the residual at the start of the timestep. If the ratio of the two residuals is less than a user-specified value, that equation is deemed to have converged for a timestep.</p>
+<p>In many transient flows, the absolute convergence criterion could be too stringent causing a large number of iterations per timestep. For example, the scaling of the continuity equation is based on the value of the continuity residual in the first five iterations. The scaling factor could be low if the initial continuity residual is small and thus the scaled residual could fail to meet the absolute convergence criterion. With the relative convergence criterion, convergence is checked by comparing the residual at an iteration of a timestep with the residual at the beginning of the timestep and hence this problem is alleviated. Thus, relative convergence criterion is recommended for unsteady simulations.</p>
+<p><img src="./img/lab6/residuals.png" alt="" width="100%"></p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<h3 id="ex-6-2-Monitors">Creating New Surface Monitors<a class="anchor-link" href="#ex-6-2-Monitors">&#182;</a></h3><p>Are we at steady state yet? In addition to the default residual plot, we need a better indication of the evolution of solution, so that we know when the solution has converged to a steady state.</p>
+<ul>
+<li>Click <code>Create</code> under the <code>Surface monitor</code> in the <code>Monitors</code> section. </li>
+<li>In the <code>Surface Monitor</code> window, check the <code>Plot</code> box and output the monitor to window 2. Set $X$ Aixs to <code>Time Step</code>, and <code>Get Data Every</code> $1$ <code>Time Step</code>. </li>
+<li>Select the <code>Report Type</code> to be <code>Facet Maximum</code>, and the <code>Field Variable</code> to <code>Velocity Magnitude</code>.</li>
+<li>Click on the <code>New Surface</code> pulldown and make a new <code>Line/Rake</code> that is the vertical centerline across the domain.</li>
+<li>Set the monitor to watch this surface. </li>
+</ul>
+<p><img src="./img/lab6/surfacemonitor.png" alt=""></p>
+<p>The monitor will output the maximum velocity along the line at every time step.</p>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<h3 id="ex-6-2-Animation">Setting Up Animation<a class="anchor-link" href="#ex-6-2-Animation">&#182;</a></h3><ul>
+<li>To watch the entire temperature field evolve with time, you need the view the <code>Calculation Activities</code> menu and create a <code>Solution Animation</code>.</li>
+</ul>
+<p><img src="./img/lab6/calculationactivities.png" alt=""></p>
+<ul>
+<li>In the menu that appears, set the <code>Animation Sequences</code> to $1$, change <code>When</code> to <code>Time Step</code>, and hit the <code>Define</code> button.</li>
+</ul>
+<p><img src="./img/lab6/solutionanimation.png" alt=""></p>
+<ul>
+<li>In the next window that appears, change <code>Window</code> to $3$, and click the <code>Set</code> button. </li>
+</ul>
+<p><img src="./img/lab6/animationsequence.png" alt=""></p>
+<ul>
+<li>Next, change the <code>Display Type</code> to <code>Contours</code>, and in the window that appears, change <code>Contours of</code> to <code>Temperature</code>, click <code>Display</code> and close the window.</li>
+<li>Click <code>OK</code> to finish the definition. Now the <code>Active</code> box should have a checkmark.</li>
+</ul>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<h3 id="ex-6-2-Post">Run and Post-processing<a class="anchor-link" href="#ex-6-2-Post">&#182;</a></h3><ul>
+<li>Initialize the solution and run the calculation with a time step of $300$ seconds for $50$ time steps.</li>
+<li>At the top of the Viewport, click on the pulldown menu that says “1: scaled residuals” and change it to “2: convergence history”. </li>
+</ul>
+<p>As the simulation progresses, this plot will show you the value of the velocity along the centerline. Watching this plot will show us when the points on that line have reached a value that no longer changes with time.</p>
+<ul>
+<li>After the calculation, go to the <em>Graphics and Animations</em> menu, and set up a <code>Solution Animation Playback</code>.</li>
+<li>You will see the sequence you just created become available. Hit the play button and enjoy the movie!</li>
+</ul>
+<p><img src="./img/lab6/graphics.png" alt=""></p>
+<p><img src="./img/lab6/playback.png" alt=""></p>
+<p><a href="./img/lab6/sequence-1.mpeg">An example movie</a> has been provided.</p>
+</td></tr></table>
+
+
+<hr />
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</body>
+</html>
