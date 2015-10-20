@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Exercise:  Turbulent Flow</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<h2 id="workflow">Exercise:  Turbulent Flow</h2>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-10-1">Exercise:  Turbulent Flow</a><ul>
+<li><a href="#ex-10-1-Intro">Introduction</a></li>
+<li><a href="#ex-10-1-Geom">Geometry</a></li>
+<li><a href="#ex-10-1-Mesh">Mesh</a></li>
+<li><a href="#ex-10-1-Setup">Setup</a></li>
+<li><a href="#ex-10-1-Post">Post-processing</a></li>
+</ul>
+</li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+</ul>
+
+<table><tr><td>
+<hr>
+<p><a id='ex-10-1'></a></p>
+<h2 id="Exercise-10.1-Turbulent-Flow-in-a-Circular-Pipe">Exercise:  Turbulent Flow in a Circular Pipe<a class="anchor-link" href="#Exercise-10.1-Turbulent-Flow-in-a-Circular-Pipe">&#182;</a></h2>
+<p><a id='ex-10-1-Intro'></a></p>
+<h3 id="Introduction">Introduction<a class="anchor-link" href="#Introduction">&#182;</a></h3><p>In this lab, we will revisit the pipe flow example considered in before. As before, the inlet velocity is $1\,\text{m/s}$, the fluid exhausts into the atmosphere and density is $1\,\text{kg/m^3}$. However, we will change the viscosity &#956; $=$ $1$ × $10^{-5}\,\text{kg/ms}$. The Reynolds number is now</p>
+<p><img src="./img/lab10/re.png" alt=""></p>
+<p>At this Reynolds number, the flow is fully turbulent. As turbulent flows tend to take longer distance to develop, we also need to extend the pipe length accordingly.</p>
+<p><img src="./img/lab10/problem.png" alt=""></p>
+<hr>
+<p><a id='ex-10-1-Geom'></a></p>
+<h3 id="Geometry">Geometry<a class="anchor-link" href="#Geometry">&#182;</a></h3><ul>
+<li>Make a $4\,\text{m}$ by $0.05\,\text{m}$ rectangle sketch and generate a surface sketch. Make sure the bottom edge lies on the $X$-axis. </li>
+</ul>
+<p><img src="./img/lab10/geom.png" alt="" width="100%"></p>
+<hr>
+<p><a id='ex-10-1-Mesh'></a></p>
+<h3 id="Mesh">Mesh<a class="anchor-link" href="#Mesh">&#182;</a></h3><ul>
+<li>Apply a mapped face meshing to the surface body.</li>
+<li>Use edge sizing tools to insert $400$ elements along the length, and $10$ elements along the width.</li>
+</ul>
+<p><img src="./img/lab10/mesh.png" alt="" width="100%"></p>
+<ul>
+<li>Create name selections. </li>
+</ul>
+<p><img src="./img/lab10/named.png" alt=""></p>
+<hr>
+<p><a id='ex-10-1-Setup'></a></p>
+<h3 id="Setup">Setup<a class="anchor-link" href="#Setup">&#182;</a></h3><ul>
+<li>Launch FLUENT with double precision.</li>
+<li>In the <code>General</code> task page, choose <code>Axisymmetric</code> under $2D$ Space. </li>
+<li>In the <code>Models</code> task page, open <code>Viscous Model</code> and choose <code>k-epsilon (2 eqn)</code>. </li>
+<li>Examine other available models, but accept the default settings. </li>
+</ul>
+<p><img src="./img/lab10/viscous.png" alt=""></p>
+<ul>
+<li>In the <code>Materials</code> task page, change the properties of air as stated in the <code>Introduction</code>. </li>
+<li>In the <code>Boundary Conditions</code> task page, set the left boundary to <code>velocity-inlet</code>. Enter $1\,\text{m/s}$ for <code>Velocity Magnitude</code>. </li>
+<li><p>In the <code>Turbulence</code> box, select <code>Intensity and Hydraulic Diameter</code> as the <code>Specification Method</code>. Then enter $1%$ for <code>Turbulence Intensity</code> and $0.1\,\text{m}$ for <code>Hydraulic Diameter</code>.<br>
+Turbulence intensity is the ratio of the root-mean-square of the velocity fluctuations,&#250; $_r$$_m$$_s$, to the mean flow velocity,&#252;. Although the fluctuations are of high frequency, their magnitudes are small compared to the mean flow. So turbulence intensity is usually no more than a few percent. For an under-developed, undisturbed upstream, a low turbulence intensity as $1%$ is appropriate.</p>
+</li>
+<li><p>Set the right boundary to <code>pressure-outlet</code>, and apply the same turbulence specification to it.</p>
+</li>
+<li>Set the bottom boundary to <code>axis</code>, and the top boundary to <code>wall</code>. </li>
+</ul>
+<p><img src="./img/lab10/inlet.png" alt=""></p>
+<ul>
+<li>In the <code>Reference Values</code> section, select <code>Compute from</code> <code>Velocity Inlet</code>.</li>
+<li>In the <code>Solution Methods</code> task page, change the <code>Spatial Discretization</code> for <code>Turbulent Kinetic Energy</code> and <code>Turbulent Dissipation Rate</code> to <code>Second Order Upwind</code>. </li>
+<li>In the <code>Monitors</code> task page, set the <code>convergence criteria</code> for all terms to $1$ × $10^{-6}$. </li>
+<li><code>Initialize</code> the solution from the <code>inlet</code>, and request $500$ iterations. </li>
+</ul>
+<hr>
+<p><a id='ex-10-1-Post'></a></p>
+<h3 id="Post-processing">Post-processing<a class="anchor-link" href="#Post-processing">&#182;</a></h3><ul>
+<li>After the solution converges, go to <code>Graphics and Animations</code>.</li>
+<li>Open the <code>Contours</code> window, and notice that a new category – <code>Turbulence</code> – becomes available under <code>Contours of</code>.</li>
+<li>Plot some key flow variables and examine the solution. </li>
+</ul>
+<p><img src="./img/lab10/contours.png" alt=""></p>
+<ul>
+<li>Next, go to <code>Plots</code> and open <code>XY Plot</code>. </li>
+<li>First, plot the <code>Velocity Magnitude</code> along the axis.<br>
+It takes significantly longer for a turbulent flow to become fully developed.</li>
+</ul>
+<p><img src="./img/lab10/contours.png" alt=""></p>
+<ul>
+<li><p>Then, plot the <code>y+</code> along the wall. Examine the value. 
+Is it in the valid range?</p>
+</li>
+<li><p>Plot the <code>Velocity Magnitude</code> along the <code>outlet</code>.<br>
+Note the gap between the first elements. Apparently, the near wall mesh was too coarse to capture the boundary layer. Nonetheless, the solution in the core region looks fine. We will inspect its accuracy later. Export the velocity profile on the outlet for further analysis.</p>
+</li>
+</ul>
+<p><img src="./img/lab10/velocity.png" alt=""></p>
+</td></tr></table>
+
+<hr />
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</body>
+</html>

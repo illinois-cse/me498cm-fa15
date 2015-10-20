@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Exercise:  Turbulent Flow with a Fine Mesh</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<h2 id="workflow">Exercise:  Turbulent Flow with a Fine Mesh</h2>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-10-2">Exercise:  Turbulent Flow with a Fine Mesh</a><ul>
+<li><a href="#ex-10-2-Mesh">Mesh</a></li>
+<li><a href="#ex-10-2-Setup">Setup</a></li>
+<li><a href="#ex-10-2-Post">Post-processing</a></li>
+</ul>
+</li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+</ul>
+
+<table><tr><td>
+<hr>
+<p><a id='ex-10-2'></a></p>
+<h2 id="Exercise-10.2-Turbulent-Flow-in-a-Circular-Pipe-(Fine-Mesh)">Exercise:  Turbulent Flow in a Circular Pipe (Fine Mesh)<a class="anchor-link" href="#Exercise-10.2-Turbulent-Flow-in-a-Circular-Pipe-(Fine-Mesh)">&#182;</a></h2>
+<p><a id='ex-10-2-Mesh'></a></p>
+<h3 id="Mesh">Mesh<a class="anchor-link" href="#Mesh">&#182;</a></h3><ul>
+<li>Now close FLUENT and go back to Workbench.</li>
+<li>Left click on the little triangle at the upper left corner of the project and duplicate it. An identical project will appear next to the original one. This time, we will refine the near wall mesh and apply the $k$-$ω$ model. </li>
+<li>Open the meshing software. </li>
+<li>First, we will double the number of elements along the width. In addition, we will condense the mesh near the wall. </li>
+</ul>
+<p><img src="./img/lab10/mesh1.png" alt="" width="100%"></p>
+<ul>
+<li>In the <code>Details of Edge Sizing</code>, select <code>Bias Type</code> as shown in the picture and enter $10$ for the <code>Bias Factor</code>. It means the largest gird will be $10$ times the size of the smallest one. </li>
+<li>You will need to apply another edge sizing to the right boundary with opposite Bias Type because of the default direction of edges. </li>
+</ul>
+<p><img src="./img/lab10/edge.png" alt=""></p>
+<hr>
+<p><a id='ex-10-2-Setup'></a></p>
+<h3 id="Setup">Setup<a class="anchor-link" href="#Setup">&#182;</a></h3><ul>
+<li>Update the mesh and close it.</li>
+<li>Launch FLUENT with double precision.</li>
+<li><p>In <code>Models</code> task page, change the <code>viscous</code> model to <code>SST k-omega</code>.<br>
+Notice that the wall functions have disappeared. The $k$-$ω$ models attempt to explicitly resolve the boundary layer.</p>
+</li>
+<li><p>Keep the rest settings as before.</p>
+</li>
+<li><code>Initialize</code> from <code>inlet</code> and request $500$ iterations.</li>
+</ul>
+<hr>
+<p><a id='ex-10-2-Post'></a></p>
+<h3 id="Post-Processing">Post Processing<a class="anchor-link" href="#Post-Processing">&#182;</a></h3><ul>
+<li>Again, plot <code>y+</code> along the wall. This time, the value will fall into the viscous sublayer. </li>
+<li>Plot the velocity profile on the <code>outlet</code>. With the refined mesh, the boundary layer was successfully captured.</li>
+<li>Export the data. </li>
+</ul>
+<p><img src="./img/lab10/velocity1.png" alt=""></p>
+<p>Although there is not an analytical solution for turbulent flow velocity profile, a number of empirical correlations exist. The power law states that</p>
+<p><img src="./img/lab10/power.png" alt=""></p>
+<ul>
+<li>Import the profile data of $k$-$ε$ model and $k$-$ω$ model into an excel spread sheet. Then compare their results. </li>
+</ul>
+<p><img src="./img/lab10/compare.png" alt=""></p>
+</td></tr></table>
+
+<hr />
+<h2 id="credits">Credits</h2>
+<p>Sparsh Chadha, Neal Davis, and Zhongzhong Zhang developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</body>
+</html>
