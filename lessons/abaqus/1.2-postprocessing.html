@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>Postprocessing</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<section id="heading" class="clearfix">
+    <table><tr><td>
+      <div id="logo-heading">
+        <img src="./img/abaqus-logo1.png" width="571"/>
+      </div></td></tr><tr><td>
+      <h2>A Short Course for Engineers</h2></td></tr></table>
+    </section>
+<h2 id="introduction-workflow">Postprocessing &amp; Visualization</h2>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-2">Exercise 2: Exploring the Beam Analysis Results</a>
+<ul>
+<li><a href="#ex-2-viewmanip">View Manipulation &amp; Options</a></li>
+<li><a href="#ex-2-render">Render Style</a></li>
+<li><a href="#ex-2-display">Display Group</a></li>
+<li><a href="#ex-2-field">Field Output Visualization</a></li>
+<li><a href="#ex-2-advanced-tools">More Advanced Tools</a></li>
+</ul></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+<hr />
+<p><a id='ex-2'></a></p>
+<h2 id="exercise-1.2-exploring-the-beam-analysis-results">Exercise 2: Exploring the Beam Analysis Results</h2>
+<p>There are many, many ways to extract desired information out of a simulation. Let's follow through a few of them directly and see what data we can access.</p>
+<p>If you haven't completed the first exercise, please download the <a href="./data/1.1-beam.cae">Abaqus files</a> in order to complete this section.</p>
+
+<table><tr><td>
+<p><a id='ex-2-viewmanip'></a></p>
+<h3 id="view-manipulation-options">1. View Manipulation &amp; Options</h3>
+<p>In the <em>Toolbar</em>, there is a <em>View Manipulation</em> menu.</p>
+<div class="figure">
+<img src="./img/toolbar_view.png" />
+</div>
+<p>In the <em>Viewport</em>, there is a <em>View</em> compass.</p>
+<div class="figure">
+<img src="./img/viewport_compass.png" />
+</div>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-2-render'></a></p>
+<h3 id="render-style">2. Render style</h3>
+<div class="figure">
+<img src="./img/toolbar_render_style.png" />
+</div>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-2-display'></a></p>
+<h3 id="display-group">3. Display Group</h3>
+<p><img src="./img/dialog_create_display_group.png" align="right"/> A <em>display group</em> is a collection of viewable objects allowing you to visualize data along certain surfaces or nodes or within certain volumes.</p>
+<p>To create a display group:</p>
+<ol style="list-style-type: decimal">
+<li>Select particular items of interest.</li>
+<li><p>Perform a Boolean operation from the toolbar on your selection and the contents of the current viewport.</p>
+<div class="figure">
+<img src="./img/toolbar_boolean.png" />
+</div>
+</li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-2-field'></a></p>
+<h3 id="field-output-visualization">4. Field Output Visualization</h3>
+<h4 id="viewing-models-each-step">Viewing models each step</h4>
+<ul>
+<li><p>Click on one of the two icons in the first row of the toolbar area <img src="./img/icon_view_steps.png" />. (You can choose the step at which to view the model by selecting <code>Result→Step/Frame</code> from the <em>Main Menu</em>.)</p>
+<blockquote>
+<strong>Tips</strong>: Click <code>Apply</code> in each options dialog box to implement your changes in the <em>Viewport</em>. The shape of your deformed model is based on the values of the particular deformed field output variable that you select. Locate the options that control the deformed field output variable.
+</blockquote>
+<p>From the <em>Main Menu</em>, select <code>Result→Field Output</code>. Click the <code>Deformed Variable</code> tab in the dialog box that appears.</p></li>
+</ul>
+<h4 id="viewing-both">Viewing Both</h4>
+<p><img src="./img/icon_view_options_popout.png" align="right"/></p>
+<ul>
+<li><p>To combine undeformed and deformed model shapes into a single plot, select <code>Plot→Contours, Symbols, or Material Orientations→On Both Shapes</code> from the <em>Main Menu</em>. Alternatively,use the <img src="./img/icon_view_options_tool1.png" />, <img src="./img/icon_view_options_tool2.png" />, and <img src="./img/icon_view_options_tool3.png" /> tools in the <em>Toolbox</em> area by clicking and holding on the icon for a moment.</p></li>
+<li><p>To superimpose the undeformed and deformed shapes without contours, symbols, or material orientations or to display any combination of plot types for the same results, use the <em>Allow multiple plot state</em> tool <img src="./img/icon_allow_multiple_plot_state.png" /> and select all of the desired plot types from the <em>Toolbox</em>.</p></li>
+</ul>
+<h4 id="contours">Contours</h4>
+<ul>
+<li>Locate the options that control the primary field output variable. From the <em>Main Menu</em>, select <code>Result→Field Output</code>. Click the <code>Primary Variable</code> tab in the dialog box that appears.</li>
+</ul>
+<p><img src="./img/dialog_field_output.png" align="right" width="350"/></p>
+<h4 id="symbol-plot">Symbol Plot</h4>
+<ul>
+<li><p>Use the <em>Field Output</em> dialog box to specify the variable you want to plot. When you select a symbol variable from the toolbar, the <em>Visualization</em> module automatically switches the display to plot symbols on the deformed model shape.</p>
+To create a symbol plot of nodal displacement:
+<ol style="list-style-type: decimal">
+<li>From the list of variable types on the left side of the <em>Field Output</em> dialog box, select <code>symbol variable</code>.</li>
+<li>From the list of output variables in the center of the <em>Toolbar</em>, select <code>U (spatial displacement at nodes)</code>.</li>
+</ol></li>
+</ul>
+<h4 id="customize">Customize</h4>
+<ul>
+<li><p>To customize the appearance of the undeformed shape, use the toolbar area icons to affect the display.</p>
+<blockquote>
+<strong>Tips</strong>: You can also customize the deformed plot shape using the <img src="./img/icon_view_options_tool4.png" /> tool in the <em>Toolbox</em>. To customize the similar options for the undeformed shape, select <code>Options→Common</code> or use the <img src="./img/icon_view_options_tool5.png" /> tool in the <em>Toolbox</em>.
+</blockquote>
+<em>To customize the viewport:</em>
+<ol style="list-style-type: decimal">
+<li>Locate the <em>State Block</em> options. From the <em>Main Menu</em>, select <code>Viewport→Viewport Annotation Options→State Block</code>.</li>
+<li>Set up the <em>Legend</em>. <code>Viewport→Viewport Annotation Options→Legend</code>.</li>
+</ol></li>
+</ul>
+<p><img src="./img/dialog_view_cut_manager.png" align="right" width="250"/></p>
+<h4 id="cutting-through-a-model">Cutting Through A Model</h4>
+<ul>
+<li>From the toolbox bar, select View Cut <img src="./img/icon_view_cut.png" />. The <em>View Cut Manager</em> appears with a list of all the view cuts that have been created during the current session. A check mark appears in the <em>Show</em> column to the left of the active view cut.
+<ol style="list-style-type: decimal">
+<li><p>Click the check boxes in the Model columns to the right of the view cut to display the model below <img src="./img/option_view_cut_below.png" />, on <img src="./img/option_view_cut_on.png" />, and/or above <img src="./img/option_view_cut_above.png" /> the cut (these positions are not mutually exclusive). The selected portion of the model is displayed in the <em>Viewport</em>.</p></li>
+<li><p>To create a view cut, select <code>Create</code>. The <em>Create Cut</em> dialog box appears. Click the arrow next to the <code>Shape</code> text field, and select a shape from the list that appears: <code>Plane</code>, <code>Cylinder</code>, <code>Sphere</code>, or <code>Isosurface</code>.</p></li>
+<li><p>To display the resultant force and moment along that view cut (acting on the visible component), click the check box under the <em>Freebody cut</em> icon in the <em>Model</em> columns for the active view cut.</p></li>
+</ol></li>
+</ul>
+<div class="figure">
+<img src="./img/viewport_resultant.png" align="right"/>
+</div>
+</td></tr></table>
+
+<h4 id="Multipe Viewports">Multiple Viewports</h4>
+<ul>
+<li>From the menu, select <code> Viewport → Create</code>. From the menu, select <code> Viewport → Tile Vertically</code> to arrange viewports side by side. 
+	Now you can plot two different fields in each view port and compare side by side. Follow directions given in the <a href="#contours">Contours</a> section to show spatial displacement at nodes in the new viewport.</li>
+<img src="./img/multiple_viewport.png" align="middle" width="900"/>
+</ul>
+
+<ul>
+</ul>
+<p><a id='ex-2-advanced-tools'></a></p>
+<h3 id="more-advanced-tools">5. More Advanced Tools</h3>
+<h4 id="Path-plot">Path Plot</h4>
+<ul> Path plots can be used to visualize solution field along a predifined path. Here, we want to plot distribution of
+	displacement in the Z-direction along the cantilever.  
+	<ol style="list-style-type: decimal">
+	<li><p> From menu select <code> Tools → Path → Create</code>. </p></li>
+	<li><p> In the Create Path window, select <em>Point List</em> and hit continue.</p></li>
+	<li><p> In the appearing window, enter (0,0,0) and (0,0,200) as the point coordinates for the initial and terminal points and click Ok.</p></li>
+	<li><p> From menu select <code>Tools → XY data → Create</code></p></li>
+	<li><p> Crom Create XY Data, select Path and hit Continue</p></li>
+	<li><p> For the Path, select <em>Path-1</em>, choose <em>Undeformed</em> and toggle on <em>Include interactions</em></p></li>
+	<li><p> Click on <em>Field Output...</em> and select <em>U</em> as the output variable and <em>U3</em> as the component and hit Ok.</p></li>
+	<li><p> Click on Plot to see distribution of the displacement component along the selected path.</p></li>
+<img src="./img/ex-1-1_path_plot.png" align="middle" width="800"/>	
+</ul>	
+	
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Ruizhi Li, Binyue Hou, and Masoud Safdari developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>
