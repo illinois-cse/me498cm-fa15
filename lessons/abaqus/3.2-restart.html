@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>2.2 Vibration of a Pipe Redux</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<section id="heading" class="clearfix">
+    <table><tr><td>
+      <div id="logo-heading">
+        <img src="../img/abaqus-logo1.png" width="571"/>
+      </div></td></tr><tr><td>
+      <h2>A Short Course for Engineers</h2></td></tr></table>
+    </section>
+<h2 id="load-analysis">2. Load &amp; Analysis</h2>
+<h5 id="april-2-2015-computational-science-and-engineering">April 2, 2015 • Computational Science and Engineering</h5>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-2">Exercise 2.2: Vibration of a Pipe Redux</a>
+<ul>
+<li><a href="#ex-2-restart">Restart Analysis</a></li>
+<li><a href="#ex-2-post">Postprocessing</a></li>
+</ul></li>
+<li><a href="#refs">Reference</a></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+<hr />
+
+<table><tr><td>
+<p><a id='ex-2'></a></p>
+<h2 id="exercise-2.2-vibration-of-a-pipe-redux">Exercise 2.2: Vibration of a Pipe Redux</h2>
+<div class="figure">
+<img src="./img/ex2.1-problem.png" align="center" />
+</div>
+<p>The first simulation predicted that the piping section <em>would</em> be vulnerable to resonance when extended axially. We must now determine how much <em>additional</em> axial load will increase the pipe's lowest vibrational frequency to an acceptable level.</p>
+<p>We will conduct this analysis by <em>restarting</em> the previous analysis of the vibration.</p>
+<p><a href="../data/2.1-pipe.cae">Data files</a> are available.</p>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-2-restart'></a></p>
+<h3 id="restart-analysis">Restart Analysis</h3>
+<p><img src="./img/dialog_model_manager.png" align="right" width="250"/></p>
+<ol style="list-style-type: decimal">
+<li><p>Copy the model named <code>Original</code> to a model named <code>Restart</code>. (Go to the <em>Model Manager</em> from the <em>Main Menu</em>, or right click on <code>Original</code> at the model tree) <br/><br/><br/><br/><br/><br/><br/><br/> <img src="./img/dialog_edit_model_attributes.png" align="right" width="300"/></p></li>
+<li>Set the model attributes. To perform a restart analysis, the model's attributes must be changed to indicate that the model should reuse data from a previous analysis.
+<ol style="list-style-type: decimal">
+<li>In the <em>Model Tree</em>, double-click the <code>Restart</code> model underneath the <em>Models container</em>.</li>
+<li>The <em>Edit Model Attributes</em> dialog box that appears, specify that restart data will be read from the job <code>Pipe</code> and that the restart location will be the end of step <code>Frequency I</code>. <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/> <img src="./img/dialog_step_manager.png" align="right" width="350"/></li>
+</ol></li>
+<li>Create two new analysis steps.
+<ol style="list-style-type: decimal">
+<li>The first new step is a general static step.
+<ol style="list-style-type: decimal">
+<li>Name the step <code>Pull II</code>, and insert it immediately after the step <code>Frequency I</code>.</li>
+<li>Give the description <code>Apply axial tensile load of 8.0 MN</code> to the step.</li>
+<li>Set the <code>time period</code> for the step to <code>1.0</code> and the <code>initial time increment</code> to <code>0.1</code>.</li>
+</ol></li>
+<li>The second new step is a frequency extraction step.
+<ol style="list-style-type: decimal">
+<li>Name the step <code>Frequency II</code>.</li>
+<li>Insert it immediately after the step <code>Pull II</code>.</li>
+<li>Give the step the description <code>Extract modes and frequencies</code>.</li>
+<li>Use the <code>Lanczos</code> eigensolver to extract the first <code>8</code> natural modes and frequencies of the pipe.</li>
+</ol></li>
+<li>For the step <code>Pull II</code>, write data to the restart file <code>Every 10 increments</code>.</li>
+<li>Accept all other default output data requests.</li>
+</ol></li>
+<li>Modify the load definition so that the tensile load that is applied to the pipe is doubled in the second general static step (<code>Pull II</code>). To do this,
+<ol style="list-style-type: decimal">
+<li>Expand the <em>Force</em> item underneath the <em>Loads</em> container in the <em>Model Tree</em>.</li>
+<li>In the list that appears, expand the <em>States</em> item.</li>
+<li>Double-click the step named <code>Pull II</code>.</li>
+<li>Change the value of the applied force to <code>8.0E+06</code> in this step.</li>
+</ol></li>
+<li>Create a job named <code>PipeRestart</code>.
+<ol style="list-style-type: decimal">
+<li>Add the description <code>Restart analysis of a 5 meter long pipe under tensile load</code>.</li>
+<li>Set the job type to <code>Restart</code> if it is not already. (If the job type is not set to Restart, Abaqus/CAE ignores the model's restart attributes.)</li>
+</ol></li>
+<li><p>Save your model in a model database file, and submit the job for analysis.</p></li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-2-post'></a></p>
+<h3 id="postprocessing">Postprocessing</h3>
+<h4 id="plotting-the-eigenmodes-of-the-pipe-system">Plotting the Eigenmodes of the Pipe System</h4>
+<h6 id="plotting-xy-graphs-from-field-data-for-selected-steps">Plotting X–Y graphs from field data for selected steps</h6>
+<p>Use the field data stored in the output database files, <code>Pipe.odb</code> and <code>PipeRestart.odb</code>, to plot the history of the axial stress in the pipe for the whole simulation.</p>
+<ol style="list-style-type: decimal">
+<li>In the <em>Results Tree</em>, double-click <em>XYData</em> to show the <em>Create XY Data</em> dialog box.
+<ol style="list-style-type: decimal">
+<li>Select <code>ODB field output</code> from this dialog box, and click Continue to proceed.</li>
+<li>In the <em>XY Data from ODB Field Output</em> dialog box, select the <em>Variables</em> tab.
+<ol style="list-style-type: decimal">
+<li>Accept the default selection of <code>Integration Point</code> for variable position.</li>
+<li>Select <code>S11</code> from the list of available stress components.</li>
+<li>Toggle <code>Select</code> for the section point.</li>
+<li><p>Click <em>Settings</em> to choose a section point.</p></li>
+<li>In the <em>Field Report Section Point Settings</em> dialog box:
+<ol style="list-style-type: decimal">
+<li>Select the category <code>beam</code> and choose any available section point for the pipe cross-section.</li>
+</ol></li>
+<li>In the <em>XY Data from ODB Field Output</em> dialog box, select the <em>Elements/Nodes</em> tab.
+<ol style="list-style-type: decimal">
+<li><p>Select <code>Element labels</code> as the selection <em>Method</em>.</p>
+<p>There are 30 elements in the model, and they are numbered consecutively from 1 to 30. Enter any element number (e.g., <code>18</code>) in the <em>Element labels</em> field.</p></li>
+</ol></li>
+<li>Click <code>Active Steps/Frames</code>, and select <code>Pull II</code> as the only step to extract data from.</li>
+<li>At the bottom of the XY Data from ODB Field Output dialog box:
+<ol style="list-style-type: decimal">
+<li><p>Click Plot to see the history of axial stress in the element.</p>
+<p>The resulting plot shows the axial stress history for each integration point of the element during the restart analysis. Since there is a job history prior to the restart, it is desirable to view the entire analysis.</p></li>
+</ol></li>
+</ol></li>
+</ol></li>
+</ol>
+<h6 id="plotting-history-of-entire-analysis">Plotting history of entire analysis</h6>
+<ol style="list-style-type: decimal">
+<li><p>Save the current plot by clicking <code>Save</code> at the bottom of the <em>XY Data from ODB Field Output</em> dialog box. Two curves are saved (one for each integration point), and default names are given to the curves.</p></li>
+<li><p>Rename one curve <code>RESTART</code>, and delete the other curve.</p></li>
+<li><p>From the main menu bar, select <code>File→Open</code> or use the <img src="./img/icon_file_open.png" /> tool in the <em>File toolbar</em> to open the file <code>Pipe.odb</code>.</p></li>
+<li><p>Following the procedure outlined above, save the plot of the axial stress history for the same element and integration/section point used above. Name this plot <code>ORIGINAL</code>.</p></li>
+<li><p>In the <em>Results Tree</em>, expand the <em>XYData container</em>.</p></li>
+<li><p>Select both plots with <code>[Ctrl]+Click</code>. Right click to display a <em>context menu</em>. Select <code>Plot</code> from this menu to create a plot of axial stress history in the pipe for the entire simulation.</p></li>
+<li>To change the style of the line, open the <em>Curve Options</em> dialog box.
+<ol style="list-style-type: decimal">
+<li>For the <code>RESTART</code> curve, select the dotted line style <code>— — —</code>.</li>
+<li>Dismiss the dialog box.</li>
+</ol></li>
+<li>To change the axis titles, open the <em>Axis Options</em> dialog box. In the <em>Title</em> tab:
+<ol style="list-style-type: decimal">
+<li>Change the X-axis title to <code>TOTAL TIME</code>.</li>
+<li>Change the Y-axis title to <code>STRESS S11</code>.</li>
+<li>Dismiss the dialog box.</li>
+</ol></li>
+</ol>
+<table>
+<tr>
+<td>
+<img src="./img/plot_ex2.3_history.png" align="center" width="350"/>
+</td>
+<td>
+<img src="./img/plot_ex2.3_history3.png" align="center" width="350"/>
+</td>
+</tr>
+<tr>
+<td>
+<strong>Figure 1</strong>. History of axial stress in the pipe.
+</td>
+<td>
+<strong>Figure 2</strong>. History of axial stress in the pipe during Step 3.
+</td>
+</tr>
+</table>
+</td></tr></table>
+
+<hr />
+<p><a id='refs'></a></p>
+<h2 id="reference">Reference</h2>
+<p>This tutorial is based on an example from the <a href="http://www.material.physik.uni-goettingen.de/abaqus/v6.12/books/gsa/ch11s03.html">Abaqus 6.12 documentation</a>.</p>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Ruizhi Li, and Binyue Hou developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>

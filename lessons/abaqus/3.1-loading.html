@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>2.1 Vibration of a Pipe</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<section id="heading" class="clearfix">
+    <table><tr><td>
+      <div id="logo-heading">
+        <img src="../img/abaqus-logo1.png" width="571"/>
+      </div></td></tr><tr><td>
+      <h2>A Short Course for Engineers</h2></td></tr></table>
+    </section>
+<h2 id="load-analysis">2. Load &amp; Analysis</h2>
+<h5 id="april-2-2015-computational-science-and-engineering">April 2, 2015 • Computational Science and Engineering</h5>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-1">Exercise 2.1: Vibration of a Pipe</a>
+<ul>
+<li><a href="#ex-1-parts">Module <em>Part</em></a></li>
+<li><a href="#ex-1-property">Module <em>Property</em></a></li>
+<li><a href="#ex-1-assembly">Module <em>Assembly</em></a></li>
+<li><a href="#ex-1-step">Module <em>Step</em></a></li>
+<li><a href="#ex-1-load">Module <em>Load</em></a></li>
+<li><a href="#ex-1-mesh">Module <em>Mesh</em></a></li>
+<li><a href="#ex-1-job">Module <em>Job</em></a></li>
+<li><a href="#ex-1-vis">Module <em>Visualization</em></a></li>
+</ul></li>
+<li><a href="#refs">Reference</a></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+<hr />
+<p><a id='ex-1'></a></p>
+<h2 id="exercise-2.1-vibration-of-a-pipe">Exercise 2.1: Vibration of a Pipe</h2>
+<p>We will study the vibrational frequencies of a <span class="math">\(5 \,\textrm{m}\)</span> section of pipe. The pipe is clamped firmly at one end and can move only axially at the other end. We will use three-dimensional beam elements to model the pipe section.</p>
+<div class="figure">
+<img src="./img/ex2.1-problem.png" align="center" />
+</div>
+
+<p>When unloaded, the lowest vibrational mode of the pipe is <span class="math">\(40.1 \,\textrm{Hz}\)</span>. However, loading may affect the response. Resonance is highly undesirable in this system, so we require the magnitude of the in-service load such that the pipe's lowest vibrational mode is higher than <span class="math">\(50 \,\textrm{Hz}\)</span>. It is intended that this section of pipe be subject to axial tension in service; we should therefore consider various loads, starting with a load magnitude of <span class="math">\(4 \,\textrm{MN}\)</span>.</p>
+
+<table><tr><td>
+<p><a id='ex-1-part'></a></p>
+<h3 id="module-part">Module <em>Part</em></h3>
+<p>You should now create a <code>3D</code>, <code>deformable</code>, <code>planar</code> <code>wire</code> part (using a scale just larger than the largest dimension of your model). Name this part <code>Pipe</code>. Select the <em>Create Lines: Connected</em> tool and sketch a horizontal line of length <code>5.0 m</code>. (This time, use the icon on the <em>Model</em> tree.)</p>
+<div class="figure">
+<img src="./img/viewport_ex2_part.png" />
+
+<table><tr><td>
+<p><a id='ex-1-property'></a></p>
+<h3 id="module-property">Module <em>Property</em></h3>
+<p>We will utilize a steel similar to that of the first exercise (the loaded beam):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Material Property &amp; Value</th>
+<th align="center">Name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><span class="math">\(E = 2 \times 10^{11} \,\textrm{Pa}\)</span></td>
+<td align="center">Young's modulus</td>
+</tr>
+<tr class="even">
+<td align="center"><span class="math">\(\nu = 0.3\)</span></td>
+<td align="center">Poisson's ratio</td>
+</tr>
+<tr class="odd">
+<td align="center"><span class="math">\(\rho = 7800 \,\textrm{kg·m}^{-3}\)</span></td>
+<td align="center">density</td>
+</tr>
+</tbody>
+</table>
+<ol>
+<li><p>Create a steel <code>Steel</code> with the foregoing properties. To edit the density, select <code>Edit Material -&gt; General -&gt; Density</code>.</p></li>
+<li><p>Create a Pipe profile from the main menu bar (<code>Profile</code>) or from the toolbar box <img src="./img/icon_create_pipe.png" />. Name the profile <code>PipeProfile</code>, and specify the shape as <code>Pipe</code>.</p>
+<p>In the <em>Edit Profile</em> dialog box, choose <code>Thin-walled type</code>, and specify an outer radius of <span class="math">\(0.18 \,\textrm{m} \div 2 = 0.09 \,\textrm{m}\)</span> and a wall thickness of <span class="math">\(0.02 \,\textrm{m}\)</span> for the pipe.</p>
+<blockquote>
+<strong>Note</strong>: Profile definition is necessary here, since we used only a simple line to represent the pipe.
+</blockquote></li>
+<li><img src="./img/dialog_create_profile.png" align="right"/> Create a section named <code>PipeSection</code> of category <code>Beam</code> and type <code>Beam</code>. In the <em>Edit Beam Section</em> dialog box, we must specify that section integration will be performed during analysis and assign material <code>Steel</code> and profile <code>PipeProfile</code> to the section definition.
+<blockquote><strong>Note</strong>: Settings &ldquo;<code>during analysis</code>&rdquo; are used when section properties must be recomputed as the beam deforms.</blockquote>
+<blockquote><strong>Note</strong>: The option <code>Section Poisson’s ratio</code> provides uniform strain in the section due to the strain of the beam axis so that the cross-sectional area changes when the beam is stretched.</blockquote></li>
+
+<li><img src="./img/dialog_edit_profile.png" align="right"/> Assign section <code>PipeSection</code> to the pipe.</p></li>
+<li>Click <code>Assign Beam Orientation</code> <img src="./img/icon_assign_beam_orientation.png" /> and use the default direction of <span class="math">\((0,0,-1)\)</span>.</li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-1-assembly'></a></p>
+<h3 id="module-assembly">Module <em>Assembly</em></h3>
+<ol>
+<li><p>Create a dependent instance of the part named <code>Pipe</code>.</p></li>
+<li>Create geometry sets.
+<blockquote>
+<strong>Note</strong>: In Abaqus, you can define different types of sets, such as geometry, load, boundary condition; this allows you to edit parts by group rather than individually when necessary.
+</blockquote></li>
+<li><p>In the model tree go to <code>Model-1→Assembly</code> and double-click on <code>Sets</code>. Or in the menu bar go to <code>Tools→Set→Create</code>.</p></li>
+<li><p>In the <em>Create Set</em> dialog box, name the <code>Set</code> as <code>LeftEnd</code> and <code>Continue</code> to select the left end of the pipe; click <code>Done</code> in the <em>Prompt Area</em>. A new set named <code>Left</code> in the <em>Sets tree</em> appears. Create another set named <code>RightEnd</code> containing the right end of the pipe.</p></li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-1-step'></a></p>
+<h3 id="module-step">Module <em>Step</em></h3>
+<p>Two steps are required:</p>
+<table style="border:1px solid black;">
+<thead>
+<tr class="header">
+<th align="left">Step</th>
+<th align="left">Details</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left"> General</td>
+<td align="left">Apply a 4 MN tensile force.</td>
+</tr>
+<tr class="even">
+<td align="left"> Linear perturbation</td>
+<td align="left">Calculate modes and frequencies.</td>
+</tr>
+</tbody>
+</table>
+<p><img src="./img/dialog_edit_step.png" align="right" width="350"/></p>
+<ol>
+<li>Create a step of the type <code>General; Static, General</code>.
+<ol>
+<li>Name this step <code>Pull I</code> with the following description:  <code>Apply axial tensile load of 4.0 MN.</code></li>
+<li>In the <em>Edit Step</em> dialog box, include the effects of geometric nonlinearity by toggling on <code>Nlgeom</code>. Specify <code>Time period</code> of <code>1</code> and <code>Incrementation→Initial increment size</code> of <code>0.1</code>.
+<blockquote>
+Time has no physical meaning in a static analysis procedure, but this causes Abaqus/Standard to apply 10% of the load in the first increment. We just need it load relatively fast.
+</blockquote></li>
+</ol></li>
+<li>Create another step of the type <code>Linear perturbation, frequency</code>.
+<ol>
+<li>Name the step <code>Frequency I</code>, and give it the following description:  <code>Extract modes and frequencies; extract the first 8 eigenmodes for the model.</code></li>
+<li>In the <em>Edit Step</em> dialog box, choose <code>Eigensolver: Subspace</code>, request <code>8</code> eigenvalues, use <code>16</code> vectors per iteration and limit the maximum number of iterations to <code>30</code>.</li>
+</ol></li>
+<li>The final default step is <code>Output requests</code>. In this case, the default output database output requests created by Abaqus/CAE for each step will suffice and we do not need to create any additional output database output requests. But if you do need to request output to the restart file:
+<ol>
+<li>In the <em>Main Menu</em>, select <code>Output→Restart Requests</code> from the <em>Main Menubar</em> of the <em>Step</em> module.</li>
+<li>For the step labeled <code>Pull I</code>, write data to the restart file <code>Every 10 increments</code>.</li>
+<li>For the step labeled <code>Frequency I</code>, write data to the restart file <code>Every 1 increment</code>.</li>
+</ol></li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-1-load'></a></p>
+<h3 id="module-load">Module <em>Load</em></h3>
+<img src="./img/dialog_edit_load-2.1.png" align="right"/> <ol><li>In the first step <code>Pull I</code>, create a <code>Mechanical Concentrated force</code> named <code>Force</code> that applies a <code>4E6</code> <span class="math">\(\textrm{N}\)</span> tensile force to the <code>RightEnd</code> set. This will cause it to deform in the positive axial (global 1) direction.  (Adjust these steps in the context bar, or in the model tree, go to <code>Steps→Pull I→BCs/Loads</code>.) Now you can use the sets we just created, can click the right end in the viewport, or select from the <em>Sets</em> list in the prompt area.</li>
+<li><img src="./img/dialog_edit_boundary_condition-2.1.png" align="left"/> The pipe section is clamped at its left end (<code>Encastre</code>). It is also clamped at the right end; however, the axial force must be applied at this end, so only degrees of freedom 2 through 6 (<code>U2</code>, <code>U3</code>, <code>UR1</code>, <code>UR2</code>, and <code>UR3</code>) are constrained.
+<blockquote>
+<strong>Note</strong>: All loads and boundary conditions are applied in the first step.
+</blockquote>
+</li></ol>
+<div class="figure">
+<img src="./img/viewport_ex2_load.png" />
+</div>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-1-mesh'></a></p>
+<h3 id="module-mesh">Module <em>Mesh</em></h3>
+<img src="./img/dialog_element_type.png" align="right" width="350"/> <ol><li>Seed and mesh the pipe section with <code>30</code> uniformly spaced <code>Quadratic</code> pipe elements (<code>PIPE32</code>).</li><ol><li>Five meters with thirty elements–skip the calculator an just go to the command line <img src="./img/icon_command_line.png" />.</li><li>For a 2D model, you don’t need to assign mesh control.</li></ol>
+<li>Before continuing, rename the model to <code>Original</code> (at the <em>Model tree</em>).</li>
+<li>Create a job named <code>Pipe</code> with the description <code>Analysis of a 5 meter long pipe under tensile load</code>.</li>
+<li>Save your model in a model database file, and submit the job for analysis.</li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-1-job'></a></p>
+<h3 id="module-job">Module <em>Job</em></h3>
+<p><img src="./img/dialog_pipe_monitor.png" align="right" width="350"/> You can open the <em>Job Monitor</em> in the <em>Job Manager</em> dialog box. Here you can see the <em>Log</em>, <em>Errors</em>, <em>Warnings</em> and other output of the <code>Pipe</code> job.</p>
+<ol>
+<li>Open the folder where your job is running. We can see these files:
+<ul>
+<li><code>Pipe.log</code></li>
+<li><code>Pipe.dat</code></li>
+<li><code>Pipe.msg</code></li>
+<li><code>Pipe.odb</code></li>
+<li><code>Pipe.inp</code></li>
+<li><code>Pipe.res</code></li>
+<li><code>...</code></li>
+</ul>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-1-vis'></a></p>
+<h3 id="module-visualization">Module <em>Visualization</em></h3>
+<ol>
+<li>Enter the <em>Visualization</em> module, and open the output database file, Pipe.odb, created by this job.</li>
+<li>To plot the first mode shape:
+<ol>
+<li>From the <em>Main Menu</em>, select <code>Result→Step/Frame</code>.</li>
+<li>In the <em>Step/Frame</em> dialog box, select step <code>Frequency I</code> and frame <code>Mode 1</code>.</li>
+<li>Click <code>OK</code>.</li>
+</ol></li>
+</ol>
+</td></tr></table>
+
+<hr />
+<p><a id='refs'></a></p>
+<h2 id="reference">Reference</h2>
+<p>This tutorial is based on an example from the <a href="http://www.material.physik.uni-goettingen.de/abaqus/v6.12/books/gsa/ch11s03.html">Abaqus 6.12 documentation</a>.</p>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Ruizhi Li, and Binyue Hou developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>
