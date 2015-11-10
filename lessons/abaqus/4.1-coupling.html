@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>4.1 Thermal Gradient &amp; Pressure on a Spherical Tank</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<section id="heading" class="clearfix">
+    <table><tr><td>
+      <div id="logo-heading">
+        <img src="../img/abaqus-logo1.png" width="571"/>
+      </div></td></tr><tr><td>
+    </section>
+<h2 id="contents">Contents</h2>
+<ul>
+<li><a href="#ex-3">Exercise 4.1: Thermal Gradient &amp; Pressure on Spherical Tank</a>
+<ul>
+<li><a href="#ex-3-modeling">Modeling</a></li>
+<li><a href="#ex-3-conds">Predefined Conditions</a></li>
+<li><a href="#ex-3-meshing">Meshing</a></li>
+<li><a href="#ex-3-post">Job &amp; Postprocessing</a></li>
+</ul></li>
+<li><a href="#refs">Reference</a></li>
+<li><a href="#credits">Credits</a></li>
+</ul>
+<hr />
+
+<table><tr><td>
+<p><a id='ex-3'></a></p>
+<h2 id="exercise-2.3-thermal-gradient-and-pressure-on-a-spherical-tank">Exercise 4.1: Thermal Gradient &amp; Pressure on a Spherical Tank</h2>
+<p>We will now calculate factors involved with a spherical steel tank under the effect of both a thermal gradient and pressure due to a contained fluid.</p>
+<p><a href="./data/4.1-temperature.cae">Data files</a> are available.</p>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-3-modeling'></a></p>
+<h3 id="modeling">Modeling</h3>
+<p><img src="./img/sketcher_ex2.3.png" align="right" width="350"/></p>
+<ol>
+<li>Create a <code>2D</code> <code>deformable</code> <code>Shell</code> part, named <code>Tank</code>. The approximate size should be <code>0.5</code>. Use the <em>Create Arc</em> <img src="./img/icon_create_arc.png" /> and <em>Connected line</em> <img src="./img/icon_connected_line.png" /> tools to create a quarter of Spherical Tank. Use <em>Add Dimension</em> <img src="./img/icon_add_dimension.png" /> to set the inner radius to be 1.E-1; outer radius to be 2.E-1. <br/><br/><br/><br/><br/><br/><br/><br/><br/><br/> <img src="./img/dialog_edit_material_2.3.png" align="right" width="350"/></li>
+<li>Create a material named <code>Steel</code>.
+<ol>
+<li>Define the <code>Elastic property</code> with <span class="math">\(E=\)</span> <code>210.E9</code> and <span class="math">\(\nu=\)</span> <code>0.3</code>.</li>
+<li>We need to define more properties for the coupled problem. Open the <em>Edit Material</em> dialog box.
+<ol>
+<li>In <code>Mechanical→Expansion</code>, define thermal expansion coefficient to be <code>1.2E-5</code>.</li>
+<li>In <code>Thermal→Conductivity</code>, define the thermal conductivity to be <code>43</code>.</li>
+</ol></li>
+</ol></li>
+<li>Create the section of this material named <code>SteelSection</code> and assign it to the <code>Tank</code> part.</li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-3-conds'></a></p>
+<h3 id="predefined-conditions">Predefined Conditions</h3>
+<ol>
+<li><img src="./img/dialog_create_boundary_condition_2.3.png" align="right" width="350"/> First instance the <code>Tank</code> part and create a new step named <code>CouTemp</code> of type is <code>General Coupled temp-displacement</code>.</li>
+<ol><li>In the <em>Edit Step</em> dialog box, choose <code>Response type</code> <code>Steady-state</code> and toggle on <code>Nlgeom</code>.</p></li></ol>
+<li><p>Since it is a quarter of the tank, we define symmetry boundary condition at the left and bottom. From <code>Initial Step</code>, at the left boundary fix <code>U1</code> and <code>UR3</code>; at the bottom boundary fix <code>U2</code> and <code>UR3</code>.</p></li>
+<li>In the step <code>CouTemp</code>, we create a temperature boundary along the inner surface of tank. Choose <em>Create Boundary Condition</em>.
+<ol>
+<li>In this dialog box, select <em>Category</em> <code>Other</code> and <em>Types</em> <code>Temperature</code>, naming it <code>InnerTemp</code> with <em>Magnitude</em> <code>100</code>.</li>
+<li>Similarly, define an outer surface temperature of <code>30</code>. <br/><br/><br/><br/><br/><br/></li>
+</ol></li>
+<li><p><img src="./img/viewport_bcs_2.3.png" align="right" width="300"/></p><p>The contained fluid also exerts pressure on the inner surface of the tank. Define an <code>InnerPressure</code> of <code>30E5</code> along the inner surface.</p></li>
+</ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-3-meshing'></a></p>
+<h3 id="meshing">Meshing</h3>
+<p><img src="./img/viewport_mesh_2.3.png" align="right" width="300"/></p>
+<ol><li>Use the <em>Seed edges</em> <img src="./img/icon_seed_edges.png" /> tool to seed the inner and outer edge with <code>30</code> elements.</li>
+<li>Seed the left and bottom edge with <code>10</code> elements.</li>
+<li>For the elements, choose the <code>Standard</code> element library in the <code>Coupled Temperature-Displacement</code> family with a <code>Quadratic</code> order <code>Reduced integration (CPE8RT)</code> method. Use <code>Quad/Structured</code> to mesh the part.</li></ol>
+</td></tr></table>
+
+<table><tr><td>
+<p><a id='ex-3-post'></a></p>
+<h3 id="job-postprocessing">Job &amp; Postprocessing</h3>
+<p><img src="./img/viewport_vis_2.3.png" align="right" width="300"/></p>
+<ol><li>Create a job, save it, and run it.</li>
+<li>Observe the resulting temperature distribution and stress distribution with <em>Field Output</em>.</li></ol>
+</td></tr></table>
+
+<hr />
+<p><a id='refs'></a></p>
+<h2 id="reference">Reference</h2>
+<p>This tutorial is based on <a href="https://www.youtube.com/watch?v=cdPySPbRyjQ">an example</a> by Lam Phung.</p>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Ruizhi Li, and Binyue Hou developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>
