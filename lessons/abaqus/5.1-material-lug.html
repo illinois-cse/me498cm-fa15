@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>5.1 Plastic Connecting Lug</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<section id="heading" class="clearfix">
+    <table><tr><td>
+      <div id="logo-heading">
+        <img src="./img/abaqus-logo1.png" width="571"/>
+      </div></td></tr><tr><td>
+    </section>
+<h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#ex-1">Exercise 5.1:Plastic Connecting Lug</a><ol>
+    <li><a href="#ex-1-import">Import model</a></li>
+    <li><a href="#ex-1-modify">Modify Properties</a></li>
+    <li><a href="#ex-1-err">Error Check</a></li>
+    <li><a href="#ex-1-post">Rerun &amp; Postprocess</a></li></ol></li>
+
+<li><a href="#credits">Credits</a></li>
+
+</ol>
+
+<table><tr><td>
+<hr />
+<p><a id='ex-1'></a></p>
+<h2 id="Exercise-4.1:-Plastic-Connecting-Lug">Exercise 5.1: Plastic Connecting Lug<a class="anchor-link" href="#Exercise-4.1:-Plastic-Connecting-Lug">&#182;</a></h2><p>We try to add some plasticity into the linear connecting lug model</p>
+<p><a id='ex-1-import'></a></p>
+<h3 id="Import-the-example-cae-file-for-linear-elastic-Connecting-Lug-model">Import the example cae file for linear elastic Connecting Lug model<a class="anchor-link" href="#Import-the-example-cae-file-for-linear-elastic-Connecting-Lug-model">&#182;</a></h3><p>In the main menu, select <code>Plug-ins→Abaqus→Getting Started</code>, select <code>Connecting lug example</code> 
+ (Run, you may see some error message, it is Ok).
+ <img src="./img/ex4.1_geo.png" alt=""><br>
+ In the Models tree, you have two models, one is <code>explicit</code>, the other is <code>standard</code>, we copy the <code>standard model</code>, name it <code>Plasticity</code>.
+(Note: Right click on standard and copy model)</p>
+<p><a id='ex-1-modify'></a></p>
+<h3 id="Modify-material-property-and-Apply-Large-Load">Modify material property and Apply Large Load<a class="anchor-link" href="#Modify-material-property-and-Apply-Large-Load">&#182;</a></h3><p>The previous model is linear elastic, we need to change the material property. We will first try <code>perfect plasticity</code> (see below). 
+ Expand the model <code>Plasticity → Materials</code>, edit the <code>Steel</code> material. In the Edit Material dialog, select <code>Mechanical→Plasticity→Plastic</code>
+ <img src="./img/ex4.1_perfectpla.png" alt=""> 
+ <img src="./img/ex4.1_editpla.png" alt=""><br>
+ From the stress-strain curve, the <code>yield stress</code> is <code>380E6</code> and <code>plastic strain</code> is <code>0.0</code>(perfect plasticity) 
+ Expand the <code>Step</code> tree, double click on the second step: <code>LugLoad</code>, the Edit Step dialog appears. 
+ Here we go to <code>Incremenation</code> tab, change the Initial increment size to <code>0.2</code> (Note: For a nonlinear process, you always need small increment to get converge.)
+ To make the plasticity occur, we need a load larger than <code>380E6</code>, expand <code>LugLoad tree</code>, expand <code>Loads</code>, <code>Pressure load (Created)</code>. 
+ In the Load Manager, Edit Load, change the Magnitude to <code>10E7</code>.</p>
+<p><a id='ex-1-err'></a></p>
+<h3 id="Error-check-and-Correction">Error check and Correction<a class="anchor-link" href="#Error-check-and-Correction">&#182;</a></h3><p>Now, you can run the job, close Plasticity tree and expand Analysis. double click on the Jobs, create a new job named <code>PlasticLug</code>.
+ Select Model <code>Plasticity</code>.  In the description, write down <code>“Perfect Plasticity”</code>. Submit the job.<br>
+  <img src="./img/ex4.1_crejob.png" alt="">
+ Unfortunately, we have some errors, open the monitor, we can see that in the Errors Tab: 
+<code>“Time increment required is less than the minimum specified”</code>. 
+ Enter the <code>Visualization</code> module, in the Main menu, select <code>Tool→Job Diagnostics</code>; here you can see the details of each step and increment. 
+ Expand to the 1st Step, 1st increment, 1st iteration. You can see the residual
+  <img src="./img/ex4.1_diagno.png" alt="">
+ The applied load of 60 kN exceeds the limit load of the lug, and the lug collapses when the material yields at all the integration points 
+ through its thickness. The lug then has no stiffness to resist further deformation because of the perfectly plastic post-yield behavior of the steel.</p>
+<p>Now we add a hardening process in the material property (Fig). Open the Steel material, in the Edit Material dialog, edit the Plastic Material Behaviors.
+ Add one more line. <code>E=580E6, v=0.35</code>. Save and run again. 
+  <img src="./img/ex4.1_bilinear.png" alt=""></p>
+<p><a id='ex-1-post'></a></p>
+<h3 id="Rerun-and-Postprocess">Rerun and Postprocess<a class="anchor-link" href="#Rerun-and-Postprocess">&#182;</a></h3><p>This time, we success! Try to visualize the Von-Mises stress in deformed shape, and draw stress-strain curve (XY data, you may need to toggle on 
+ strain in the field output and re-run it  to get strain data).</p>
+<ol>
+<li>Draw the Von Mises contour.</li>
+<li>Query tools<br>
+From the main menu, select <code>Tool→ Query</code> or use the  <img src="./img/ex4.1_query.png" alt=""> icon,<br>
+Select <code>Probe values</code> in Visualization Module Queries  .
+Select <code>Element</code>, output position: <code>Integration Pt</code>, choose elements from viewport.
+3.Draw stress-strain curve
+This time use two field outputs draw one <code>XYplot</code>.
+We will plot stress-strain curve at one integration point at the specific element shown below.
+<img src="./img/ex4.1_whichele.png" alt=""><br>
+Use <code>Display Group</code> tool visualize only this element.
+Create XY Data from <code>ODB field output</code>. Extract <code>Von-Mises stress</code> and <code>E11</code> as stress/strain value. 
+In the <code>Element/Nodes tab</code>, toggle on <code>Edit Selection</code>, Method: <code>Pick from viewport</code>.
+<img src="./img/ex4.1_xyodb.png" alt=""><br>
+Select the element, click <code>Done</code>, click <code>Save</code>.<br>
+Create XY Data by <code>Operate on XY data</code>.<br>
+<img src="./img/ex4.1_operate.png" alt=""><br>
+<img src="./img/ex4.1_choose.png" alt=""><br>
+In the Operate an XY Data box, choose operator <code>combine</code>, and select the stress/strain at the same integration point, <code>plot</code> the figure.
+</td></tr></table>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Ruizhi Li, and Binyue Hou developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>

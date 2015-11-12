@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>5.2 Hyperelasticity</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<section id="heading" class="clearfix">
+    <table><tr><td>
+      <div id="logo-heading">
+        <img src="./img/abaqus-logo1.png" width="571"/>
+      </div></td></tr><tr><td>
+    </section>
+<h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#ex-2">Exercise 5.2:  Hyperelasticity</a><ol>
+    <li><a href="#ex-2-pre">Preprocessing</a></li>
+    <li><a href="#ex-2-post">Postprocessing</a></li></ol></li>
+
+<li><a href="#credits">Credits</a></li>
+</ol>
+
+<table><tr><td>
+<hr />
+<a id='ex-2'></a><
+<h2 id="Exercise-4.2:-Hyperelasticity-material-modeling">Exercise 5.2: Hyperelasticity<a class="anchor-link" href="#Exercise-4.2:-Hyperelasticity-material-modeling">&#182;</a></h2><p><code>Problem</code>
+ The mount is bonded at both ends to steel plates. It will experience axial loads up to 5.5 kN distributed uniformly across the plates. 
+ The cross-section geometry and dimensions are given.
+ <code>Question</code>
+  1.To find the axial stiffness of the rubber mount 
+  2.To identify any areas of high maximum principal stress that might limit the fatigue life of the mount.
+  <img src="./img/ex4.2_geo.png" alt=""></p>
+<p><a id='ex-2-pre'></a></p>
+<h3 id="Preprocessing">Preprocessing<a class="anchor-link" href="#Preprocessing">&#182;</a></h3><p><code>Part definition</code>
+Create an <code>axisymmetric, deformable, shell</code> part. Name the part <code>Mount</code>, and specify an approximate part size of <code>0.3</code>. Because of symmetry considerations, only 
+the bottom half of the mount will be modeled. 
+When you first enter the sketcher, the axis of revolution is displayed as a green dashed line with a fixed position constraint; your sketch cannot cross this axis.
+  <img src="./img/ex4.2_axis.png" alt=""></p>
+<p><a href="../data/4.2-mount.cae">Data files</a> are available.</p>
+<p><code>Sketch the mount geometry</code>
+  1.Draw an arbitrary rectangle to the right of the axis of symmetry.
+    Set the horizontal distance between the axis of symmetry and the left edge of the rectangle to 0.01 m.(symmetry line lies at x=0)
+      The coordinate of two corners: <code>(0.01,0) (0.06,0.03)</code>
+  2.Sketch a circle using the <code>Create Circle: Center and Perimeter</code> tool. 
+      a. Set the horizontal distance between the axis of symmetry and the center of the circle to 0.1 m. 
+      b. Set the vertical distance between the center of the circle and the top-right vertex of the rectangle to 0 m. <code>Center: (0.1,0.03)</code>
+      c. Set the vertical distance between the perimeter point (where the circle snaps to the rectangle) and the bottom-right vertex of the rectangle to 0.005 m. 
+         point on the circle: <code>(0.06,0.005)</code>
+      <img src="./img/ex4.2_notrim.png" alt=""></p>
+<ol>
+<li>Use the <code>Auto-Trim tool</code> <img src="./img/ex4.2_autotrim.png" alt="">  to remove the excess portions of the sketch.</li>
+<li><p>Finish the part definition, <code>Done</code>.
+ <img src="./img/ex4.2_finalpart.png" alt=""></p>
+<p><code>Material properties: hyperelastic model for the rubber</code>
+You have been given some experimental test data for the rubber material used in the mount. Three different sets of test data 
+a uniaxial test, a biaxial test, and a planar (shear) test—are available.
+<blockquote><strong>Note</strong>:  Volumetric test data are not required when the material is incompressible (as is the case in this example).</blockquote>
+<img src="./img/ex4.2_Nominal_strain.png" alt="">
+<p>
+<table>
+<tr valign="top">
+<td><p><b>Uniaxial test data</b></p></td>
+<td><p><b>Biaxial test data</b></p></td>
+<td><p><b>Planar test data</b></p></td></tr>
+<tr valign="top">
+<td><table>
+<tr><td><p><b>Stress (Pa)</b></p></td><td><p><b>Strain</b></p></td></tr>
+<tr><td><p>5.40E+04</p></td><td><p>0.038</p></td></tr>
+<tr><td><p>1.52E+05</p></td><td><p>0.1338</p></td></tr>
+<tr><td><p>2.54E+05</p></td><td><p>0.221</p></td></tr>
+<tr><td><p>3.62E+05</p></td><td><p>0.345</p></td></tr>
+<tr><td><p>4.59E+05</p></td><td><p>0.46</p></td></tr>
+<tr><td><p>5.83E+05</p></td><td><p>0.6242</p></td></tr>
+<tr><td><p>6.56E+05</p></td><td><p>0.851</p></td></tr>
+<tr><td><p>7.30E+05</p></td><td><p>1.4268</p></td></tr>
+</table></td>
+<td><table>
+<tr><td><p><b>Stress (Pa)</b></p></td><td><p><b>Strain</b></p></td></tr>
+<tr><td><p>8.90E+04</p></td><td><p>0.02</p></td></tr>
+<tr><td><p>2.55E+05</p></td><td><p>0.14</p></td></tr>
+<tr><td><p>5.03E+05</p></td><td><p>0.42</p></td></tr>
+<tr><td><p>9.58E+05</p></td><td><p>1.49</p></td></tr>
+<tr><td><p>1.70E+06</p></td><td><p>2.75</p></td></tr>
+<tr><td><p>2.41E+06</p></td><td><p>3.45</p></td></tr>
+</table></td>
+<td><table>
+<tr><td><p><b>Stress (Pa)</b></p></td><td><p><b>Strain</b></p></td></tr>
+<tr><td><p>5.50E+04</p></td><td><p>0.069</p></td></tr>
+<tr><td><p>3.24E+05</p></td><td><p>0.2828</p></td></tr>
+<tr><td><p>7.58E+05</p></td><td><p>1.3862</p></td></tr>
+<tr><td><p>1.27E+06</p></td><td><p>3.0345</p></td></tr>
+<tr><td><p>1.78E+06</p></td><td><p>4.0621</p></td></tr>
+</table>
+</td></tr>
+</table>
+</p>
+When define a hyperelastic material using experimental data, must specify the strain energy potential that you want to apply to the data. 
+ABAQUS uses experimental data to calculate the coefficients necessary for the specified strain energy potential.</p>
+<p><code>To define and evaluate hyperelastic material behavior:</code><br>
+1.Create a hyperelastic material named <code>Rubber</code>. In this example a first-order, polynomial strain energy function is used to model the rubber material.
+2.In the <code>Edit Material</code> dialog, select <code>Mechanical→ Elastic→Hyperelastic</code>;
+3.Material type is : <code>Isotropic</code>
+4.Select <code>Polynomial</code> from the <code>Strain energy potential</code> list in the material editor. Enter the <code>test data</code> given above using the <code>Test Data menu</code>.
+ <img src="./img/ex4.2_EditMater.png" alt=""> 
+ <img src="./img/ex4.2_TestData.png" alt=""><br>
+To visualize the experimental data, right click on the table for any of the test data and select <code>Create X–Y Data</code>. And you can check it in the Results tree.<br>
+5.In the Model Tree, right click on <code>Rubber</code> underneath the <code>Materials</code> container. Select <code>Evaluate</code> from the menu that appears to perform the standard unit-element tests (uniaxial, biaxial, and planar). Specify a minimum strain of <code>0</code> and a maximum strain of <code>1.75</code> for each test. In the <code>Strain Energy Potentials Tab</code>, evaluate only the <code>first-order polynomial strain energy function(Mooney-Rivlin)</code>. 
+ <img src="./img/ex4.2_MatEva.png" alt=""></p>
+<p><code>Completing the material and section definitions and assigning section properties</code>
+Create another material: <code>steel</code> is modeled with linear elastic properties only ( <code>E = 200 × 109 Pa,  v = 0.3</code>). 
+Create two <code>homogeneous solid section</code> definitions: one named <code>RubberSection</code> that refers to the rubber material and one named <code>SteelSection</code> that refers to the steel material.
+Before assigning section properties, partition the part into the two regions using the <code>Partition Face: Sketch tool</code>.
+  <img src="./img/ex4.2_Partition.png" alt=""></p>
+<ol>
+<li>In the Sketcher, draw a horizontal line extending from the point where the circular arc intersects the right edge to any point past the left edge of the sketch.</li>
+<li>The upper region is the rubber mount, while the lower region represents the steel plate. <code>Assign</code> the section definitions to each region.</li>
+</ol>
+<p><code>Creating an assembly and a step definition</code><br>
+Create a <code>dependent</code> instance of the part. 
+Define a single <code>static, general step</code> named <code>Compress mount</code>.</p>
+<ol>
+<li>Toggle on <code>Nlgeom</code>. </li>
+<li>Set the <code>total step time</code> to <code>1.0</code> and the <code>initial time increment</code> to <code>0.01</code>.
+For the purpose of restricting output, <code>create a geometry</code> set named <code>Out</code> at the vertex located at the lower-left corner of the steel plate region.
+<img src="./img/ex4.2_out1.png" alt=""><br>
+<img src="./img/ex4.2_out2.png" alt=""></li>
+</ol>
+<p><code>Output requests:</code>
+1, Write the <code>preselected variables</code> and <code>nominal strains</code> as field output to the output database file <code>every increment</code>. 
+(Toggle on the <code>NE, Nominal strain</code> in the Filed out put Request Edit)
+2, Write the displacements of set <code>Out</code> to the output database file as history 
+data so that the stiffness of the mount can be calculated.
+<img src="./img/ex4.2_edithisout.png" alt=""></p>
+<p><code>Applying loads and boundary conditions</code>
+Specify boundary conditions for the region on the symmetry plane (the top)
+(<code>U2 = 0</code> or <code>YSYMM</code> would be equivalent in this case).
+The mount must carry a maximum axial load of <code>5.5 kN</code>, the magnitude of the 
+pressure is given by 5E5 Pa (apply at the bottom plane)
+<img src="./img/ex4.2_loadcondition.png" alt=""></p>
+<p><code>Creating the mesh and the job</code><br>
+1.Use <code>Linear, axisymmetric Stress, hybrid formulation elements (CAX4H)</code> for the rubber mount.
+2.Assign mesh control <code>structured quadrilateral</code> mesh. 
+3.Seed the part by specifying the number of elements along the edges (by selecting <code>Seed Edge By Number</code> or the  <img src="./img/ex4.2_seednumtool.png" alt=""> tool). 
+Specify <code>30</code> elements along each horizontal edge, <code>14</code> elements along the vertical and curved edges of the rubber, and <code>1</code> element along the vertical edges of the steel. 
+4.Create mesh
+<img src="./img/ex4.2_mesh.png" alt=""><br>
+5.Create a job named <code>Mount</code>. Give the job the following description: <code>Axisymmetric mount analysis under axial loading</code>.
+6.<code>Save</code> your model in a model database file, and <code>submit</code> the job for analysis.</p></li>
+</td></tr></table>
+
+<table><tr><td>
+<hr />
+<a id='ex-2-post'></a>
+<h3 id="Postprocessing">Postprocessing<a class="anchor-link" href="#Postprocessing">&#182;</a></h3><p><h4>Calculating the stiffness of the mount</h4>
+<p>
+To determine the stiffness of the mount by creating an <code>X–Y plot</code> of the displacement of the steel plate as a function of the applied load.</p>
+<p>A. To create a history curve of vertical displacement and swap the X- and Y-axes:</p>
+<ol>
+<li>In the Results Tree, expand the <code>History Output</code> container underneath the <code>output database</code> named <code>Mount.odb</code>.</li>
+<li>Locate and select the vertical displacement <code>U2</code> at the node in set <code>Out</code>.</li>
+<li>Right click, and select <code>Save As</code> from the menu that appears to save the X–Y data. The <code>Save XY Data As</code> dialog box appears.</li>
+<li>Type the name <code>DISP</code>, and click <code>OK</code>.</li>
+<li>In the Results Tree, double-click <code>XYData</code>.
+The <code>Create XY Data</code> dialog box appears.</li>
+<li>Select Operate on XY data, and click <code>Continue</code>.
+<img src="./img/ex4.2_operateXY.png" alt=""> </li>
+<li>In the <code>Operate on XY Data</code> dialog box, from <code>Operators</code>, select <code>swap(X)</code>.<br>
+swap( ) appears in the text field at the top of the dialog box.</li>
+<li>In the <code>XY Data field</code>, double-click <code>DISP</code>. The expression swap( "DISP" ) appears in the text field at the top of the dialog box.</li>
+<li>Save it as <code>SWAPPED</code></li>
+</ol>
+<p>Next we need a curve showing force-displacement. In this simulation the force applied to the mount is directly proportional to the total time, we only need to multiply the original curve to the magnitude of the load (5.5 kN).
+B. To multiply a curve by a constant value:</p>
+<ol>
+<li>In the <code>Operate on XY Data</code> dialog box, click <code>Clear Expression</code>.</li>
+<li>In the <code>XY Data</code> field, select <code>SWAPPED</code>.
+The expression "SWAPPED" appears in the text field at the top of the dialog box.</li>
+<li>Multiply the data object in the text field by the magnitude of the applied load by entering <code>*5500</code>.</li>
+<li>Save the multiplied data as <code>FORCEDEF</code>
+Now we have created a curve with the force-deflection characteristic of the mount To get stiffness, just differentiate the curve FORCEDEF. </li>
+</ol>
+<p>C. To obtain the stiffness:</p>
+<ol>
+<li>In the <code>Operate on XY Data</code> dialog box, clear the current expression.</li>
+<li>From the <code>Operators</code> listed, select <code>differentiate(X)</code>.
+differentiate( ) appears in the text field at the top of the dialog box.</li>
+<li>In the <code>XY Data</code> field, select <code>FORCEDEF</code>.
+The expression differentiate( "FORCEDEF" ) appears in the text field.</li>
+<li><p>Save the differentiated data as <code>STIFF</code></p>
+<p><code>Contouring the maximum principal stress</code></p>
+</li>
+</ol>
+<p>Now we want to see where the principal stress is high.
+To contour the maximum principal stress:</p>
+<ol>
+<li>Select <code>Result -&gt;Field Output</code> at the main menu</li>
+<li>At output variables, select <code>S</code>. At invariants, select <code>Max. Principal</code>.
+Now we only care about Rubber.</li>
+<li>In the Results Tree, expand the <code>Materials</code> container underneath the output database file named <code>Mount.odb</code>.</li>
+<li>Right click on <code>RUBBER</code>, and select <code>Replace</code> from the menu that appears to replace the current display with the selected elements.</li>
+<p><img src="./img/ex4.2_stress.png" alt=""></p>                                                      </td></tr></table>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Ruizhi Li, and Binyue Hou developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>
