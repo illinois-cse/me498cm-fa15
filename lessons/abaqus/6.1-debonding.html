@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="utf-8" />
+<title>6.1 Debonding</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+
+<!-- Custom stylesheet, it must be in the same directory as the html file -->
+<link rel="stylesheet" href="../css/style.css">
+
+<!-- Loading mathjax macro -->
+<!-- Load mathjax -->
+    <script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+    <!-- MathJax configuration -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {
+            inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+            displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+            processEscapes: true,
+            processEnvironments: true
+        },
+        // Center justify equations in code and markdown cells. Elsewhere
+        // we use CSS to left justify single line equations in code cells.
+        displayAlign: 'center',
+        "HTML-CSS": {
+            styles: {'.MathJax_Display': {"margin": 0}},
+            linebreaks: { automatic: true }
+        }
+    });
+    </script>
+    <!-- End of mathjax configuration -->
+
+</head>
+<body>
+<div class="container" id="notebook-container">
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+<section id="heading" class="clearfix">
+    <table><tr><td>
+      <div id="logo-heading">
+        <img src="./img/abaqus-logo1.png" width="571"/>
+      </div></td></tr><tr><td>
+    </section>
+<h2 id="introduction-workflow">6.1 Debonding</h2>
+<h2 id="contents">Contents</h2>
+<ol>
+<li><a href="#ex-3">Exercise 6.1:  Debonding of Double Cantilever Beam</a>
+<li><a href="#credits">Credits</a></li>
+</ol>
+
+<table><tr><td>
+<hr />
+<a id='ex-3'></a>
+<h2>Exercise 6.1:  Debonding of Double Cantilever Beam</h2>
+<h3 id="Problem-Description">Problem Description<a class="anchor-link" href="#Problem-Description">&#182;</a></h3>
+<p>Use displacement control to conduct a double cantilever beam fracture experiment simulation and then plot the traction-separation curve.</p>
+<p><img src="./img/ex4.3_problem.png" alt="" width="100%"></p>
+<ol>
+<li><p>First, create two parts.</p>
+<ol>
+<li><p>Create <code>2D Planar Deformable Shell</code> Part, named <code>Bot</code>. In the Sketch, draw a rectangle by using the <em>Create rectangle</em> tool <img src="./img/icon_create_rect.png" alt="">. The corners should be <code>(0, 0)</code>, <code>(9, 0.2)</code>.</p>
+</li>
+<li><p>The other part, named <code>Top</code>, should have corners at <code>(0, 0.202)</code>, <code>(9, 0.402)</code>.</p>
+<p><a href="../data/4.3-dcb.cae">Data files</a> are available.</p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="Assign-Property">Assign Property<a class="anchor-link" href="#Assign-Property">&#182;</a></h3><ol>
+<li>Create material named <code>metal</code> of type <code>linear elastic</code> with properties $E=$ <code>8e6</code>, $\nu=$ <code>0.3</code>.</li>
+<li>Create a <code>Solid</code> <code>Homogeneous</code> section named <code>MetalSection</code> using the <code>metal</code> material.</li>
+<li><em>Assign</em> the section to both parts <code>Top</code> and <code>Bot</code>.</li>
+</ol>
+<h3 id="Assembly">Assembly<a class="anchor-link" href="#Assembly">&#182;</a></h3><ol>
+<li>Since we have already given proper coordinates for each part, we can instance both of them without further configuration. <code>Create instance</code> <img src="./img/icon_create_instance.png" alt=""> using the two beam parts with an <code>Independent</code> mesh.</li>
+</ol>
+<h3 id="Mesh-and-Create-Sets">Mesh and Create Sets<a class="anchor-link" href="#Mesh-and-Create-Sets">&#182;</a></h3><ol>
+<li><p>Assign the element type <code>Plane Strain</code> and toggle off <code>Reduced integration (CPE4)</code>; the mesh control should be <code>Quad/ Structured mesh</code>.</p>
+</li>
+<li><p>Use <em>Display Group</em> <img src="./img/icon_display_group.png" alt=""> to see only bottom beam.  Seed the top and bottom edge with <code>90</code> elements, while the two sides have <code>4</code> elements; then create the mesh.  (Hold <em>Shift</em> to multiply select.)</p>
+</li>
+<li><p>Create a set named <code>BNODES</code> from <em>Tools→Sets→Create</em> or you can create set from model tree.  Type <code>Node</code>.
+ <img src="./img/ex4.3_bnodes.png" alt=""></p>
+<p>Select some nodes (half) along top edge from the right (see below).  (<strong>Note</strong>:  This node will not break in the simulation, and is the reference node sets.)</p>
+<p><img src="./img/ex4.3_half_nodes.png" alt="" width="100%"></p>
+</li>
+<li><p>Now you can mesh the topbeam.  Do the same as in step 2.</p>
+</li>
+<li><p>Create a few node sets for load definition later.</p>
+<ol>
+<li><p>Create a Node set named <code>fixed</code>. Select the nodes at the right edge (see pics below).
+<img src="./img/ex4.3_fixed.png" alt=""></p>
+</li>
+<li><p>Create a Node set named <code>Dbot</code> and select the node show below.  (You may use the <em>Box Zoom View</em> <img src="./img/icon_box_zoom_view.png" alt=""> to select the node)
+<img src="./img/ex4.3_dbot.png" alt="" width="100%"></p>
+</li>
+<li><p>Create a Node set named <code>Dtop</code> and select the node in the same position of Dbot at top beam (see below)</p>
+<p>(<code>Dbot</code> and <code>Dtop</code> are the place where we will apply the displacement BC.)</p>
+<p><img src="./img/ex4.3_dtop.png" alt="" width="100%"></p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="Apply-load/displacement-and-BC">Apply load/displacement and BC<a class="anchor-link" href="#Apply-load/displacement-and-BC">&#182;</a></h3><p>Here, we apply load/BC directly on the node, since that is actually how the finite element method works.</p>
+<ol>
+<li><p>Create a <code>General</code>, <code>Static</code> step named <code>Load</code>, Toggle on <code>Nlgeom</code>, Maximum number of increament: <code>5000</code>; Initial increment size: <code>0.005</code>, maximum increment size: <code>0.015</code>.</p>
+</li>
+<li><p>In the <em>Initial</em> step, apply a <code>Displacement/Rotation</code> BC on node set <code>fix</code>, toggling on <code>U1</code> and <code>U2</code>.  (<strong>Note</strong>: the tool is <em>Select node set</em> <img src="./img/icon_sets.png" alt="">.)</p>
+</li>
+<li><p>In the <em>Load</em> step, apply <code>Displacement/Rotation</code> BC at node set <code>Dbot</code> and <code>Dtop</code>. For the <code>Dbot</code>, set <code>U2</code> to be <code>-0.16</code> and for the <code>Dtop</code> set <code>U2</code> to be <code>0.16</code>.
+ <img src="./img/ex4.3_load.png" alt=""></p>
+</li>
+</ol>
+<h3 id="Define-the-interaction">Define the interaction<a class="anchor-link" href="#Define-the-interaction">&#182;</a></h3><ol>
+<li><p>Go to the <em>Interaction</em> module and select <em>Create Interaction Property</em> <img src="./img/icon_create_interaction_property.png" alt="">.  Name it <code>Cohesive</code> and select the <code>Contact</code> type.</p>
+</li>
+<li><p>In the <em>Edit Contact Property</em> dialog box, Choose <em>Mechanical</em> <em>Cohesive Behavior</em>.  Toggle on <em>Specify the bonding nodes set in the Surface-to-surface Std interaction</em>
+ <img src="./img/dialog_edit_contact_property.png" alt=""></p>
+</li>
+<li><p>Then go to <em>Mechanical</em> <em>Damage</em> and toggle on <code>Specify damage evolution</code>.  In <code>Initiation</code>, input <code>800</code> to <code>Normal only</code> &amp; <code>Shear-1Only</code>; input <code>0</code> in <code>Shear-2</code>.
+ <img src="./img/dialog_edit_contact_property_2.png" alt=""></p>
+<p>In <em>Evolution</em>, toggle on type <code>Energy</code> with <code>Linear</code> softening; also select <code>Specify mixed mode behavior</code> of type <code>Benzeggagh-Kenane</code>.</p>
+<p>Toggle on <code>Specify power-law/BK exponent</code> with a value of <code>1.75</code>. For the <code>Normal Fracture Energy</code>, input <code>0.8</code>; for the <code>1</code><sup><code>st</code></sup> <code>Shear Fracture Energy</code>, input <code>0.8</code>; <code>2</code><sup><code>nd</code></sup> <code>Shear Fracture Energy</code>, input <code>0</code>.
+ <img src="./img/dialog_edit_contact_property_3.png" alt=""></p>
+</li>
+<li><p>Finally select <code>Mechanical→Geometric→Properties</code>.  Before we create interaction, we should define the two interaction surface, which is also the crack surface. Go to <code>Tools→Surfaces→Create</code>.</p><p>
+<img src="./img/ex4.3_surface.png" alt=""></p>
+<p>Name the top surface <code>TopSurf</code> and the bottom surface <code>BotSurf</code>.  (You may need to zoom in to select both surfaces.)</p>
+</li>
+<li><p>Use the <em>Create Interaction</em> tool <img src="./img/icon_create_interaction.png" alt=""> to create a <code>Cohesive</code> interaction of type <code>Surface-to-surface contact</code> (<code>Standard</code>) with <code>TopSurf</code> selected as the master surface (since the adjust nodes we define are at the bottom beam).</p><p>
+<img src="./img/ex4.3_create_interaction.png" alt=""></p>
+<ol>
+<li><p>Now select the <code>Slave type</code> <code>Surface</code> for <code>BotSurf</code>.</p>
+<p><img src="./img/ex4.3_slave_type.png" alt=""></p>
+</li>
+<li><p>In the <em>Edit Interaction</em> dialog box, select <code>Node to Surface</code> in the <em>Discretization method</em></p>
+<p><img src="./img/ex4.3_edit_interaction.png" alt=""></p>
+</li>
+<li><p>Toggle on <code>Adjust slave nodes in set</code>, select <code>BNODE</code> set.</p>
+</li>
+<li><p>Choose <em>Cohesive</em> in the Contact interaction property.</p>
+</li>
+<li><p>After the <code>Interaction</code> definition, you can see a yellow square along the interface.</p>
+<p><img src="./img/ex4.3_interaction.png" alt="" width="100%"></p>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="Specify-the-History-output">Specify the History output<a class="anchor-link" href="#Specify-the-History-output">&#182;</a></h3><blockquote>Usually in the double cantilever beam experiment, we would like to get the traction-separation figure at the crack front.  Go to *History Output* from the mode tree and select `Domain` Set: `Dtop`.  Then we have the displacement vs reaction force relation at point `Dtop`.</blockquote>
+
+<ol>
+<li>Toggle on <code>Displacement</code>/<code>U</code>/<code>U2</code> and <code>Forces</code>/<code>RF</code>/<code>RF2</code>.</li>
+</ol>
+<h3 id="Create-and-submit-jobs.">Create and submit jobs.<a class="anchor-link" href="#Create-and-submit-jobs.">&#182;</a></h3><ol>
+<li><p>Create the job named <code>DCB</code>, save it, and submit it.</p>
+<p><img src="./img/ex4.3_results.png" alt="" width="100%"></p>
+</li>
+<li><p>Observe the stress distribution around the double cantilever beam. As well, you can draw the traction-separation plot by using the history output created.</p>
+</li>
+</ol>
+</td></tr></table>
+
+<hr />
+<p><a id='credits'></a></p>
+<h2 id="credits">Credits</h2>
+<p>Neal Davis, Ruizhi Li, and Binyue Hou developed these materials for <a href="http://cse.illinois.edu/">Computational Science and Engineering</a> at the University of Illinois at Urbana–Champaign.</p>
+<p><img src="http://i.creativecommons.org/l/by-nc/4.0/88x31.png" align="left"> This content is available under a <a href="https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 Unported License</a>.</p>
+<p><a href="http://cse.illinois.edu/"><img src="https://bytebucket.org/davis68/resources/raw/f7c98d2b95e961fae257707e22a58fa1a2c36bec/logos/baseline_cse_wdmk.png?token=be4cc41d4b2afe594f5b1570a3c5aad96a65f0d6" width="100%"/></a></p>
+</div>
+</body>
+</html>
